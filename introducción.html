@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Series de tiempo - Remesas</title>
+  <meta name="description" content="Series de tiempo - Remesas" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Series de tiempo - Remesas" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Series de tiempo - Remesas" />
+  
+  
+  
+
+<meta name="author" content="Analisis de Series de Tiempo Grupo 5 - William Contreras Camilo Espinoza Jorge Agredo" />
+
+
+<meta name="date" content="2024-10-21" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="descripción-de-las-series-de-tiempo.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal Book Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="introducción.html"><a href="introducción.html"><i class="fa fa-check"></i><b>1</b> INTRODUCCIÓN</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introducción.html"><a href="introducción.html#base-de-datos"><i class="fa fa-check"></i><b>1.1</b> BASE DE DATOS</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="descripción-de-las-series-de-tiempo.html"><a href="descripción-de-las-series-de-tiempo.html"><i class="fa fa-check"></i><b>2</b> DESCRIPCIÓN DE LAS SERIES DE TIEMPO</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="descripción-de-las-series-de-tiempo.html"><a href="descripción-de-las-series-de-tiempo.html#serie-de-tiempo-por-fecha-de-pago"><i class="fa fa-check"></i><b>2.1</b> Serie de tiempo por Fecha de Pago</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="descripción-de-las-series-de-tiempo.html"><a href="descripción-de-las-series-de-tiempo.html#uso-de-la-librería-xts"><i class="fa fa-check"></i><b>2.1.1</b> Uso de la librería “XTS”</a></li>
+<li class="chapter" data-level="2.1.2" data-path="descripción-de-las-series-de-tiempo.html"><a href="descripción-de-las-series-de-tiempo.html#gráfico-de-rezago-para-la-serie-de-tiempo"><i class="fa fa-check"></i><b>2.1.2</b> Gráfico de rezago para la serie de tiempo</a></li>
+<li class="chapter" data-level="2.1.3" data-path="descripción-de-las-series-de-tiempo.html"><a href="descripción-de-las-series-de-tiempo.html#promedios-móviles"><i class="fa fa-check"></i><b>2.1.3</b> Promedios móviles</a></li>
+</ul></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Series de tiempo - Remesas</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Series de tiempo - Remesas</h1>
+<p class="author"><em>Analisis de Series de Tiempo Grupo 5 - William Contreras Camilo Espinoza Jorge Agredo</em></p>
+<p class="date"><em>2024-10-21</em></p>
+</div>
+<div id="introducción" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> INTRODUCCIÓN<a href="introducción.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Las remesas son transferencias de dinero realizadas principalmente por emigrantes a sus familiares o relacionados en su país de origen. En este proceso participan los siguientes actores: remitente (persona que desde el país de origen se acerca a un agente para enviar un determinado monto), el agente en el lugar de origen (oficina donde se inicia la operación financiera), la empresa de transferencia de dinero (empresa que hace el traslado del monto del país de origen al país destino), el agente en el lugar de pago (oficina donde se realiza el desembolso del dinero) y el receptor (persona que en el país de destino recibe el dinero). Las transferencias entre la empresa de transferencia y los agentes se realizan en dólares, y las tasas de cambio se fijan en la fecha de origen de la transacción con una tasa de referencia establecida para cada país. Esto significa que todas las transacciones
+iniciadas en el día 𝑡 se pagarán según la tasa de referencia correspondiente a ese día.</p>
+<p>Esto genera un desafío para los agentes en el lugar de pago, dado que la tasa de pago asociada a las operaciones es informada al remitente y se fija según la tasa de referencia vigente en la fecha de origen y se mantiene inalterada hasta que el giro es cobrado. Existe una exposición a la volatilidad de la tasa de cambio entre el día inicial de la transacción
+y la fecha de cobro.</p>
+<p>Estas transacciones se identifican el día en que se realiza el pago al receptor, momento en que la tasa de mercado a la que el agente de pago convierte a moneda local los dólares recibidos por la empresa de transferencia de dinero puede haber variado con relación a la tasa de cambio con la que se fijó la conversión al momento de la originación de la remesa.</p>
+<p>En resumen, hay transacciones pagadas en el día 𝑡 que tienen como referencia una tasa de cambio de un día diferente, y el agente del lugar de pago puede monetizar (convertir de dólares a pesos colombianos) a la tasa del día 𝑡. De esta forma, en escenarios de revaluación del peso colombiano, es decir, caídas en la tasa de cambio, se generarían menores ingresos o pérdidas por concepto de monetización de dólares, materializándose el riesgo cambiario. Este proceso se ve afectado por las celebraciones especiales en cada uno de los países, tales como día de amor y amistad, día de la madre, navidad, etc.</p>
+<div id="base-de-datos" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> BASE DE DATOS<a href="introducción.html#base-de-datos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Según lo expuesto anteriormente, se identifican las siguientes variables para el conjunto de datos provisto por una entidad que realiza remesas en Colombia bajo acuerdo de confidencialidad:</p>
+<table style="width:83%;">
+<colgroup>
+<col width="36%" />
+<col width="47%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td align="left"><ul>
+<li><strong>Fecha de pago.</strong></li>
+</ul></td>
+<td align="left"><ul>
+<li><strong>Canal.</strong></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td align="left"><ul>
+<li><strong>Pais de Origen.</strong></li>
+</ul></td>
+<td align="left"><ul>
+<li><strong>Número de
+transacciones.</strong></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td align="left"><ul>
+<li><strong>Fecha de
+origen.</strong></li>
+</ul></td>
+<td align="left"><ul>
+<li><strong>Monto en dolares.</strong></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td align="left"><ul>
+<li><strong>Monto en Pesos.</strong></li>
+</ul></td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<p>En relación con la importancia de analizar esta información enfocado en la variable tiempo se puede decir que; el análisis de las variables de tipo fecha (Fecha origen de la operación y Fecha de pago) es crucial debido a la volatilidad de las tasas de cambio entre el día en que se origina la remesa y el día en que se paga. Por otra parte, el pronóstico del monto
+total a pagar en remesas es esencial para mitigar este riesgo, permitiendo anticipar posibles pérdidas por variaciones en la tasa de cambio y tomar decisiones informadas sobre cobertura y gestión del riesgo.</p>
+<p>Inicialmente los datos comprenden el periodo entre el primero de enero de 2023 hasta el 10 de octubre de 2024 de forma díaria, pero se irá aumentando los datos en la medida que la empresa entregue la información.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="descripción-de-las-series-de-tiempo.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/1_Base_de_datos.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["Remesas en dolares.pdf", "Remesas en dolares.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
