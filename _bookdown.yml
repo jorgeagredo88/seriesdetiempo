@@ -2,6 +2,6 @@ book_filename: "Remesas en dolares"
 rmd_files:
   - index.Rmd    # Introducción o primer capítulo
   - 1_Base_de_datos.Rmd # El primer archivo que quieres combinar
-  - 2_Graficos.Rmd # El segundo archivo que quieres combinar
+  - 2_Visualizacion.Rmd # El segundo archivo que quieres combinar
+output_dir: "." 
 delete_merged_file: true
-output_dir: "output" # Directorio donde se guardará el libro
