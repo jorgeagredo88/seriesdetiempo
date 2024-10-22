@@ -1,0 +1,9 @@
+introducción
+base-de-datos
+descripción-de-las-series-de-tiempo
+serie-de-tiempo-por-fecha-de-pago
+uso-de-la-librería-xts
+gráfico-de-rezago-para-la-serie-de-tiempo
+promedios-móviles
+promedio-móvil-simple-sma
+promedio-móvil-exponencial-ema.

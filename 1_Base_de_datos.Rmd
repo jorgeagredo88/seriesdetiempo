@@ -1,0 +1,34 @@
+# INTRODUCCIÓN
+
+
+Las remesas son transferencias de dinero realizadas principalmente por emigrantes a sus familiares o relacionados en su país de origen. En este proceso participan los siguientes actores: remitente (persona que desde el país de origen se acerca a un agente para enviar un determinado monto), el agente en el lugar de origen (oficina donde se inicia la operación financiera), la empresa de transferencia de dinero (empresa que hace el traslado del monto del país de origen al país destino), el agente en el lugar de pago (oficina donde se realiza el desembolso del dinero) y el receptor (persona que en el país de destino recibe el dinero). Las transferencias entre la empresa de transferencia y los agentes se realizan en dólares, y las tasas de cambio se fijan en la fecha de origen de la transacción con una tasa de referencia establecida para cada país. Esto significa que todas las transacciones
+iniciadas en el día 𝑡 se pagarán según la tasa de referencia correspondiente a ese día.
+
+Esto genera un desafío para los agentes en el lugar de pago, dado que la tasa de pago asociada a las operaciones es informada al remitente y se fija según la tasa de referencia vigente en la fecha de origen y se mantiene inalterada hasta que el giro es cobrado. Existe una exposición a la volatilidad de la tasa de cambio entre el día inicial de la transacción
+y la fecha de cobro.
+
+Estas transacciones se identifican el día en que se realiza el pago al receptor, momento en que la tasa de mercado a la que el agente de pago convierte a moneda local los dólares recibidos por la empresa de transferencia de dinero puede haber variado con relación a la tasa de cambio con la que se fijó la conversión al momento de la originación de la remesa.
+
+En resumen, hay transacciones pagadas en el día 𝑡 que tienen como referencia una tasa de cambio de un día diferente, y el agente del lugar de pago puede monetizar (convertir de dólares a pesos colombianos) a la tasa del día 𝑡. De esta forma, en escenarios de revaluación del peso colombiano, es decir, caídas en la tasa de cambio, se generarían menores ingresos o pérdidas por concepto de monetización de dólares, materializándose el riesgo cambiario. Este proceso se ve afectado por las celebraciones especiales en cada uno de los países, tales como día de amor y amistad, día de la madre, navidad, etc.
+
+## BASE DE DATOS
+
+Según lo expuesto anteriormente, se identifican las siguientes variables para el conjunto de datos provisto por una entidad que realiza remesas en Colombia bajo acuerdo de confidencialidad:
+
++:------------------------+:--------------------------------+
+| -   **Fecha de pago.**  | -   **Canal.**                  |
++-------------------------+---------------------------------+
+| -   **Pais de Origen.** | -   **Número de                 |
+|                         |     transacciones.**            |
++-------------------------+---------------------------------+
+| -   **Fecha de          | -   **Monto en dolares.**       |
+|     origen.**           |                                 |
++-------------------------+---------------------------------+
+| -   **Monto en Pesos.** |                                 |
++-------------------------+---------------------------------+
+
+En relación con la importancia de analizar esta información enfocado en la variable tiempo se puede decir que; el análisis de las variables de tipo fecha (Fecha origen de la operación y Fecha de pago) es crucial debido a la volatilidad de las tasas de cambio entre el día en que se origina la remesa y el día en que se paga. Por otra parte, el pronóstico del monto
+total a pagar en remesas es esencial para mitigar este riesgo, permitiendo anticipar posibles pérdidas por variaciones en la tasa de cambio y tomar decisiones informadas sobre cobertura y gestión del riesgo.
+
+Inicialmente los datos comprenden el periodo entre el primero de enero de 2023 hasta el 10 de octubre de 2024 de forma díaria, pero se irá aumentando los datos en la medida que la empresa entregue la información.
+

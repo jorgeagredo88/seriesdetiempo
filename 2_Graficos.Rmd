@@ -1,0 +1,219 @@
+
+# DESCRIPCIÓN DE LAS SERIES DE TIEMPO
+
+A continuación se presenta la base incluyendo la variable en el tiempo, la aproximación en promedios móviles, en rezagos y en estacionalidad. Todo lo anterior, a través de funciones y gráficas que permitan detectar patrones y ciclos de la variable.
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, include = TRUE)
+#install.packages("googledrive")
+#install.packages("forecast")
+#install.packages("timsac")
+
+library(forecast)
+library(tseries)
+library(googledrive)
+library(timsac)
+library(ggplot2)
+library(changepoint)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(dplyr)
+```
+
+
+
+
+```{r echo=FALSE}
+
+archivo <- drive_get("Base_resumida_2023_2024.csv")
+drive_download(archivo, path = "Base_resumida_2023_2024.csv", overwrite = TRUE)
+Datos <- read_csv('Base_resumida_2023_2024.csv')
+colnames(Datos)[colnames(Datos) == "Fecha de Pago"] <- "Fecha_Pago"
+colnames(Datos)[colnames(Datos) == "Fecha de Origen"] <- "Fecha_Origen"
+colnames(Datos)[colnames(Datos) == "Pais Origen"] <- "Pais_Origen"
+glimpse(Datos)
+
+```
+
+Como se puede observar en la tabla resumen la base de datos se compone de 7 variables:
+
+2 tipo fecha: "Fecha_pago" y "Fecha_Origen", 3 numericas: "Número_transacciones", "Monto_USD" y "Monto_COP" y 2 tipo texto: "Pais_Origen" y "Canal".
+
+Con el objetivo de observar el comportamiento de las remesas en el tiempo, se realizará la descripción por las dos variables tipo fecha.
+
+## Serie de tiempo por Fecha de Pago
+
+Se agrupa el monto en dólares por la variable objetivo.
+
+```{r}
+Datos_FP <- aggregate(Monto_USD ~ Fecha_Pago, data = Datos, sum)
+
+```
+
+Se verifica el tipo de variable.
+```{r echo=FALSE}
+Indice.ts<-ts(Datos_FP$Monto_USD, start =c(2023,1), frequency = 365 )
+class(Indice.ts)
+```
+
+La fecha inicial
+
+```{r echo=FALSE}
+start(Indice.ts)
+
+```
+
+La fecha final
+
+```{r echo=FALSE}
+end(Indice.ts)
+```
+
+Se puede evidenciar que comienza el día 1 del 2023 y finaliza el día 284 del año 2024.
+
+Se valido que las fechas fueran consecutivas y no existieran fechas faltantes.
+
+```{r}
+fecha_min <- min(Datos_FP$Fecha_Pago)
+fecha_max <- max(Datos_FP$Fecha_Pago)
+fechas_completas <- seq(from = fecha_min, to = fecha_max, by = "day")
+fechas_faltantes <- setdiff(fechas_completas, Datos_FP$Fecha_Pago)
+fechas_faltantes
+```
+
+A continuación se realiza el gráfico del monto en dólares por fecha de pago.
+
+```{r echo=FALSE}
+plot(Datos_FP, type = "l", 
+     col = "blue", 
+     main = "Serie de Tiempo: Monto USD", 
+     ylab = "Monto USD", 
+     xlab = "Tiempo",
+     yaxt = "n")
+axis(2, at = pretty(Datos_FP$Monto_USD), 
+     labels = format(pretty(Datos_FP$Monto_USD), 
+                     scientific = FALSE))
+
+```
+
+### Uso de la librería "XTS"
+
+A pesar de conocer que la base es regular con periodicidad diaria, se decidió usar la libreria "XTS" por la utilización de las fechas exactas.
+
+
+```{r echo=FALSE}
+# Instalar y cargar el paquete xts
+#install.packages("xts")
+#install.packages("zoo")
+library(zoo)
+library(xts)
+
+
+```
+
+```{r}
+# Crear la serie de tiempo
+serie_xts <- xts(Datos_FP$Monto_USD, order.by = Datos_FP$Fecha_Pago)
+head(serie_xts)
+```
+
+
+```{r echo=FALSE}
+plot(serie_xts, col = "blue", main = "Serie de Tiempo: Monto USD", ylab = "Monto USD")
+```
+
+### Gráfico de rezago para la serie de tiempo
+
+```{r echo=FALSE}
+# Gráfico de rezago para la serie 
+lag.plot(serie_xts, lags = 12, layout = c(4, 3), main = "Gráfico de Rezago para la Serie de Tiempo")
+
+```
+
+Según la gráfica parece que existe algo de autocorrelación hasta el rezago 4, para mayores rezagos esa relación se vuelve más difusa.
+
+### Promedios móviles
+
+#### Promedio Móvil Simple (SMA)
+
+El promedio móvil simple es una técnica estadística utilizada para suavizar series de tiempo mediante la creación de un promedio de los valores en un intervalo específico de tiempo. Permite facilitar la identificación de tendencias subyacentes al hacer que las variaciones estacionales y aleatorias sean menos evidentes.
+
+Una de sus ventajas es que proporciona una visión clara de la tendencia general de los datos a lo largo del tiempo.
+
+SMA se usa principalmente en análisis financiero, como en el seguimiento de precios de acciones, proyecciones de ventas, y otras métricas de negocio.
+
+
+```{r echo=FALSE}
+
+media_movil_10 <- rollmean(Datos_FP$Monto_USD, k = 10, fill = NA, align = "right")
+media_movil_30 <- rollmean(Datos_FP$Monto_USD, k = 30, fill = NA, align = "right")
+
+plot(Datos_FP$Fecha_Pago, Datos_FP$Monto_USD, 
+     type = "l", 
+     col = "black", 
+     lwd = 1, 
+     xlab = "Fecha de Pago", 
+     ylab = "Monto USD", 
+     main = "Monto USD con Medias Móviles Simples de 10 y 30 días")
+
+# Añadir la media móvil simple de 10 días
+lines(Datos_FP$Fecha_Pago, media_movil_10, col = "blue", lwd = 2)
+
+# Añadir la media móvil simple de 30 días
+lines(Datos_FP$Fecha_Pago, media_movil_30, col = "red", lwd = 2)
+
+# Añadir leyenda para identificar las series
+legend("topright", 
+       legend = c("Datos Originales", "Media Móvil 10 días", "Media Móvil 30 días"), 
+       col = c("black", "blue", "red"), 
+       lty = 1, 
+       lwd = 2)
+```
+
+
+#### Promedio Móvil Exponencial (EMA).
+
+Es similar al promedio móvil simple (SMA), pero con un enfoque que da más peso a los datos más recientes. Este puede ser más representativo de la tendencia actual en series de tiempo con alta volatilidad.
+
+Se aplica en diversas áreas de análisis de datos, como en el monitoreo de ventas, pronósticos de demanda, y otros indicadores de rendimiento.
+
+```{r echo=FALSE}
+
+#install.packages("TTR")
+library(TTR)
+
+# Calcular la media móvil exponencial de 10 días
+ema_10 <- EMA(Datos_FP$Monto_USD, n = 10)
+
+# Calcular la media móvil exponencial de 30 días
+ema_30 <- EMA(Datos_FP$Monto_USD, n = 30)
+
+# Graficar los datos originales
+plot(Datos_FP$Fecha_Pago, Datos_FP$Monto_USD, 
+     type = "l", 
+     col = "black", 
+     lwd = 1, 
+     xlab = "Fecha de Pago", 
+     ylab = "Monto USD", 
+     main = "Monto USD con Medias Móviles Exponenciales de 10 y 30 días")
+
+# Añadir la media móvil exponencial de 10 días
+lines(Datos_FP$Fecha_Pago, ema_10, col = "blue", lwd = 2)
+
+# Añadir la media móvil exponencial de 30 días
+lines(Datos_FP$Fecha_Pago, ema_30, col = "red", lwd = 2)
+
+# Añadir leyenda para identificar las series
+legend("topright", 
+       legend = c("Datos Originales", "EMA 10 días", "EMA 30 días"), 
+       col = c("black", "blue", "red"), 
+       lty = 1, 
+       lwd = 2)
+```
+
+En las gráficas se puede observar como los promedios eliminan el ruido de los picos ocasionados los días de fin de semana, donde se realizan menos pagos de remesas sabados, domingos y festivos y mayores pagos en los días viernes.
+
+
