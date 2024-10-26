@@ -1,0 +1,17 @@
+
+# PREPROCESAMIENTO Y VISUALIZACION
+
+A continuación se presenta; descomposición, la estacionariedad y la diferenciación.
+
+
+## Descomposición - Serie de tiempo por Fecha de Pago
+
+
+
+## Estacionariedad - Serie de tiempo por Fecha de Pago
+
+
+## Diferenciación. - Serie de tiempo por Fecha de Pago
+
+
+
