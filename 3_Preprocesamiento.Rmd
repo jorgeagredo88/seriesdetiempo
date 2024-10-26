@@ -4,7 +4,7 @@
 A continuación se presenta; descomposición, la estacionariedad y la diferenciación.
 
 
-## Descomposición - Serie de tiempo por Fecha de Pago
+## Descomposición Serie de tiempo por Fecha de Pago
 
 
 

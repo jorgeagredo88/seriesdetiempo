@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2 DESCRIPCIÓN DE LAS SERIES DE TIEMPO | Series de tiempo - Remesas</title>
   <meta name="description" content="2 DESCRIPCIÓN DE LAS SERIES DE TIEMPO | Series de tiempo - Remesas" />
-  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2 DESCRIPCIÓN DE LAS SERIES DE TIEMPO | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo" />
 
 
-<meta name="date" content="2024-10-22" />
+<meta name="date" content="2024-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,7 +31,7 @@
   
   
 <link rel="prev" href="remesas.html"/>
-
+<link rel="next" href="preprocesamiento-y-visualizacion.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -66,7 +66,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -160,6 +160,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.2.3" data-path="descripción-de-las-series-de-tiempo.html"><a href="descripción-de-las-series-de-tiempo.html#promedios-móviles-1"><i class="fa fa-check"></i><b>2.2.3</b> Promedios móviles</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="3" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html"><i class="fa fa-check"></i><b>3</b> PREPROCESAMIENTO Y VISUALIZACION</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#descomposición-serie-de-tiempo-por-fecha-de-pago"><i class="fa fa-check"></i><b>3.1</b> Descomposición Serie de tiempo por Fecha de Pago</a></li>
+<li class="chapter" data-level="3.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#estacionariedad---serie-de-tiempo-por-fecha-de-pago"><i class="fa fa-check"></i><b>3.2</b> Estacionariedad - Serie de tiempo por Fecha de Pago</a></li>
+<li class="chapter" data-level="3.3" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#diferenciación.---serie-de-tiempo-por-fecha-de-pago"><i class="fa fa-check"></i><b>3.3</b> Diferenciación. - Serie de tiempo por Fecha de Pago</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -183,15 +189,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="descripción-de-las-series-de-tiempo" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">2</span> DESCRIPCIÓN DE LAS SERIES DE TIEMPO<a href="descripción-de-las-series-de-tiempo.html#descripción-de-las-series-de-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>A continuación se presenta la base incluyendo la variable en el tiempo, la aproximación en promedios móviles, en rezagos y en estacionalidad. Todo lo anterior, a través de funciones y gráficas que permitan detectar patrones y ciclos de la variable.</p>
-<pre><code>## Rows: 530,300
+<pre><code>## Rows: 529,464
 ## Columns: 7
-## $ Fecha_Pago           &lt;date&gt; 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 202…
-## $ Pais_Origen          &lt;chr&gt; &quot;AE&quot;, &quot;AE&quot;, &quot;AT&quot;, &quot;AU&quot;, &quot;AU&quot;, &quot;BE&quot;, &quot;BE&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;…
-## $ Fecha_Origen         &lt;date&gt; 2022-12-31, 2023-01-01, 2023-01-01, 2022-12-31, 2023-01-01, 202…
-## $ Canal                &lt;chr&gt; &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;RedPropia&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;R…
-## $ Numero_transacciones &lt;dbl&gt; 1, 3, 3, 3, 18, 1, 1, 12, 2, 35, 1, 2, 2, 17, 2, 1, 1, 1, 22, 1,…
-## $ Monto_USD            &lt;dbl&gt; 369.33, 471.03, 1146.18, 1781.49, 13945.66, 48.23, 418.29, 2206.…
-## $ Monto_COP            &lt;dbl&gt; 1765896, 2252157, 5480357, 8518037, 66679489, 230602, 2000000, 1…</code></pre>
+## $ Fecha_Pago        [3m[38;5;246m&lt;date&gt;[39m[23m 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 202…
+## $ Pais_Origen       [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;AE&quot;, &quot;AE&quot;, &quot;AT&quot;, &quot;AU&quot;, &quot;AU&quot;, &quot;BE&quot;, &quot;BE&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;…
+## $ Fecha_Origen      [3m[38;5;246m&lt;date&gt;[39m[23m 2022-12-31, 2023-01-01, 2023-01-01, 2022-12-31, 2023-01-01, 202…
+## $ Canal             [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;RedPropia&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;R…
+## $ Transacciones_USD [3m[38;5;246m&lt;dbl&gt;[39m[23m 1, 3, 3, 3, 18, 1, 1, 12, 2, 35, 1, 2, 2, 17, 2, 1, 1, 1, 22, 1,…
+## $ Monto_USD         [3m[38;5;246m&lt;dbl&gt;[39m[23m 369.33, 471.03, 1146.18, 1781.49, 13945.66, 48.23, 418.29, 2206.…
+## $ Monto_COP         [3m[38;5;246m&lt;dbl&gt;[39m[23m 1765896, 2252157, 5480357, 8518037, 66679489, 230602, 2000000, 1…</code></pre>
 <p>Como se puede observar en la tabla resumen la base de datos se compone de 7 variables:</p>
 <p>2 tipo fecha: “Fecha_pago” y “Fecha_Origen”, 3 numericas: “Número_transacciones”, “Monto_USD” y “Monto_COP” y 2 tipo texto: “Pais_Origen” y “Canal”.</p>
 <p>Con el objetivo de observar el comportamiento de las remesas en el tiempo, se realizará la descripción por las dos variables tipo fecha.</p>
@@ -214,7 +220,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-5"><a href="descripción-de-las-series-de-tiempo.html#cb6-5" tabindex="-1"></a>fechas_faltantes</span></code></pre></div>
 <pre><code>## numeric(0)</code></pre>
 <p>A continuación se realiza el gráfico del monto en dólares por fecha de pago.</p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <div id="uso-de-la-librería-xts" class="section level3 hasAnchor" number="2.1.1">
 <h3><span class="header-section-number">2.1.1</span> Uso de la librería “XTS”<a href="descripción-de-las-series-de-tiempo.html#uso-de-la-librería-xts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A pesar de conocer que la base es regular con periodicidad diaria, se decidió usar la libreria “XTS” por la utilización de las fechas exactas.</p>
@@ -228,11 +234,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 2023-01-04 6164948.9
 ## 2023-01-05 6986643.0
 ## 2023-01-06 6616416.0</code></pre>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="gráfico-de-rezago-para-la-serie-de-tiempo" class="section level3 hasAnchor" number="2.1.2">
 <h3><span class="header-section-number">2.1.2</span> Gráfico de rezago para la serie de tiempo<a href="descripción-de-las-series-de-tiempo.html#gráfico-de-rezago-para-la-serie-de-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Según la gráfica parece que existe algo de autocorrelación hasta el rezago 4, para mayores rezagos esa relación se vuelve más difusa.</p>
 </div>
 <div id="promedios-móviles" class="section level3 hasAnchor" number="2.1.3">
@@ -242,13 +248,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>El promedio móvil simple es una técnica estadística utilizada para suavizar series de tiempo mediante la creación de un promedio de los valores en un intervalo específico de tiempo. Permite facilitar la identificación de tendencias subyacentes al hacer que las variaciones estacionales y aleatorias sean menos evidentes.</p>
 <p>Una de sus ventajas es que proporciona una visión clara de la tendencia general de los datos a lo largo del tiempo.</p>
 <p>SMA se usa principalmente en análisis financiero, como en el seguimiento de precios de acciones, proyecciones de ventas, y otras métricas de negocio.</p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="promedio-móvil-exponencial-ema." class="section level4 hasAnchor" number="2.1.3.2">
 <h4><span class="header-section-number">2.1.3.2</span> Promedio Móvil Exponencial (EMA).<a href="descripción-de-las-series-de-tiempo.html#promedio-móvil-exponencial-ema." class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Es similar al promedio móvil simple (SMA), pero con un enfoque que da más peso a los datos más recientes. Este puede ser más representativo de la tendencia actual en series de tiempo con alta volatilidad.</p>
 <p>Se aplica en diversas áreas de análisis de datos, como en el monitoreo de ventas, pronósticos de demanda, y otros indicadores de rendimiento.</p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>En las gráficas se puede observar como los promedios eliminan el ruido de los picos ocasionados los días de fin de semana, donde se realizan menos pagos de remesas sabados, domingos y festivos y mayores pagos en los días viernes.</p>
 </div>
 </div>
@@ -270,25 +276,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 2019-08-10 250.02
 ## 2019-12-13 598.19
 ## 2020-02-24  20.70</code></pre>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <p>Se pueden obvervar casos atipicos desde 20 de noviembre de 2018, que corresponden a remesas que fueron reclamadas muy posteriormente a la originación, ya que las fechas de pago estan desde el 01 de octubre de 2023, y que debieron surtir un proceso especial.</p>
 <p>Se procede a realizar la limpieza de datos atipicos, dejando unicamente las remesas que hayan sido originadas hasta 30 dias antes del pago:</p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 </div>
 <div id="gráfico-de-rezago-para-la-serie-de-tiempo-1" class="section level3 hasAnchor" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Gráfico de rezago para la serie de tiempo<a href="descripción-de-las-series-de-tiempo.html#gráfico-de-rezago-para-la-serie-de-tiempo-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p>Según las gráficas parece al igual que en el analisis con fecha de pago, que existe algo de autocorrelación en los primeros rezagos, pero para mayores rezagos esa relación se vuelve más difusa.</p>
 </div>
 <div id="promedios-móviles-1" class="section level3 hasAnchor" number="2.2.3">
 <h3><span class="header-section-number">2.2.3</span> Promedios móviles<a href="descripción-de-las-series-de-tiempo.html#promedios-móviles-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="promedio-móvil-simple-sma-1" class="section level4 hasAnchor" number="2.2.3.1">
 <h4><span class="header-section-number">2.2.3.1</span> Promedio Móvil Simple (SMA)<a href="descripción-de-las-series-de-tiempo.html#promedio-móvil-simple-sma-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 </div>
 <div id="promedio-móvil-exponencial-ema.-1" class="section level4 hasAnchor" number="2.2.3.2">
 <h4><span class="header-section-number">2.2.3.2</span> Promedio Móvil Exponencial (EMA).<a href="descripción-de-las-series-de-tiempo.html#promedio-móvil-exponencial-ema.-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 <p>En las gráficas se puede observar como los promedios eliminan el ruido de los picos ocasionados los días de fin de semana, donde se realizan menos pagos de remesas sabados, domingos y festivos y mayores pagos en los días viernes.</p>
 
 </div>
@@ -300,8 +306,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="remesas.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="remesas.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="preprocesamiento-y-visualizacion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
