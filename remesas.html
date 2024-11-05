@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Series de tiempo - Remesas</title>
   <meta name="description" content="Series de tiempo - Remesas" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo" />
 
 
-<meta name="date" content="2024-11-04" />
+<meta name="date" content="2024-11-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,7 +66,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -162,29 +162,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="3" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html"><i class="fa fa-check"></i><b>3</b> PREPROCESAMIENTO Y VISUALIZACION</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#descomposición-estacionariedad-y-diferenciación---serie-de-tiempo-por-fecha-de-pago"><i class="fa fa-check"></i><b>3.1</b> Descomposición, estacionariedad y diferenciación - Serie de tiempo por Fecha de Pago</a></li>
-<li class="chapter" data-level="3.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#verificar-si-la-serie-es-esacionaria"><i class="fa fa-check"></i><b>3.2</b> Verificar si la serie es esacionaria</a></li>
-<li class="chapter" data-level="3.3" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#funciones-acf-y-pacf"><i class="fa fa-check"></i><b>3.3</b> Funciones acf y pacf</a></li>
-<li class="chapter" data-level="3.4" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#modelo-arima"><i class="fa fa-check"></i><b>3.4</b> Modelo ARIMA</a>
+<li class="chapter" data-level="3.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#descomposición-de-la-serie-temporal---serie-de-tiempo-por-fecha-de-pago"><i class="fa fa-check"></i><b>3.1</b> Descomposición de la serie temporal - Serie de tiempo por Fecha de Pago</a>
 <ul>
-<li class="chapter" data-level="3.4.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#modelo-arima-1"><i class="fa fa-check"></i><b>3.4.1</b> <strong>Modelo ARIMA</strong></a></li>
-<li class="chapter" data-level="3.4.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#coeficientes-del-modelo"><i class="fa fa-check"></i><b>3.4.2</b> <strong>Coeficientes del Modelo</strong></a></li>
-<li class="chapter" data-level="3.4.3" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#errores-estándar-s.e."><i class="fa fa-check"></i><b>3.4.3</b> <strong>Errores Estándar (s.e.)</strong></a></li>
-<li class="chapter" data-level="3.4.4" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#sigma2"><i class="fa fa-check"></i><b>3.4.4</b> <strong>Sigma^2</strong></a></li>
-<li class="chapter" data-level="3.4.5" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#log-likelihood-aic-aicc-bic"><i class="fa fa-check"></i><b>3.4.5</b> <strong>Log Likelihood, AIC, AICc, BIC</strong></a></li>
-<li class="chapter" data-level="3.4.6" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#resumen"><i class="fa fa-check"></i><b>3.4.6</b> Resumen</a></li>
+<li class="chapter" data-level="3.1.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#estacionariedad"><i class="fa fa-check"></i><b>3.1.1</b> Estacionariedad</a></li>
 </ul></li>
-<li class="chapter" data-level="3.5" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#diagnóstico-del-modelo."><i class="fa fa-check"></i><b>3.5</b> Diagnóstico del modelo.</a></li>
-<li class="chapter" data-level="3.6" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#prediccones-del-modelo-arima"><i class="fa fa-check"></i><b>3.6</b> Prediccones del Modelo ARIMA</a></li>
-<li class="chapter" data-level="3.7" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#punto-de-cambio-de-la-serie-de-tiempo"><i class="fa fa-check"></i><b>3.7</b> Punto de cambio de la serie de tiempo</a></li>
-<li class="chapter" data-level="3.8" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#gráfica-acf-y-pacf-de-los-residuos"><i class="fa fa-check"></i><b>3.8</b> Gráfica ACF y PACF de los residuos</a></li>
-<li class="chapter" data-level="3.9" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#prueba-de-ljung-box"><i class="fa fa-check"></i><b>3.9</b> Prueba de Ljung-Box</a>
+<li class="chapter" data-level="3.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#función-de-autocorrelación-acf-y-función-de-autocorrelación-parcial-pacf"><i class="fa fa-check"></i><b>3.2</b> Función de Autocorrelación (ACF) y Función de Autocorrelación Parcial (PACF)</a></li>
+<li class="chapter" data-level="3.3" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#componentes-de-la-descomposición"><i class="fa fa-check"></i><b>3.3</b> Componentes de la Descomposición</a></li>
+<li class="chapter" data-level="3.4" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#modelo-arima"><i class="fa fa-check"></i><b>3.4</b> Modelo ARIMA</a></li>
+<li class="chapter" data-level="3.5" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#punto-de-cambio-de-la-serie-de-tiempo"><i class="fa fa-check"></i><b>3.5</b> Punto de cambio de la serie de tiempo</a></li>
+<li class="chapter" data-level="3.6" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#predicciones-del-modelo-arima"><i class="fa fa-check"></i><b>3.6</b> Predicciones del Modelo ARIMA</a></li>
+<li class="chapter" data-level="3.7" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#validaciones"><i class="fa fa-check"></i><b>3.7</b> Validaciones</a>
 <ul>
-<li class="chapter" data-level="3.9.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#interpretación-de-los-resultados"><i class="fa fa-check"></i><b>3.9.1</b> Interpretación de los Resultados</a></li>
-<li class="chapter" data-level="3.9.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#conclusión"><i class="fa fa-check"></i><b>3.9.2</b> Conclusión</a></li>
+<li class="chapter" data-level="3.7.1" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#outliers"><i class="fa fa-check"></i><b>3.7.1</b> Outliers</a></li>
+<li class="chapter" data-level="3.7.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#supuestos-de-una-arima"><i class="fa fa-check"></i><b>3.7.2</b> Supuestos de una ARIMA</a></li>
 </ul></li>
-<li class="chapter" data-level="3.10" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#normalidad-de-los-residuos"><i class="fa fa-check"></i><b>3.10</b> Normalidad de los residuos</a></li>
-<li class="chapter" data-level="3.11" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#gráfico-q-q-quantile-quantile"><i class="fa fa-check"></i><b>3.11</b> Gráfico Q-Q (Quantile-Quantile)</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -209,7 +200,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">Series de tiempo - Remesas</h1>
 <p class="author"><em>Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo</em></p>
-<p class="date"><em>2024-11-04</em></p>
+<p class="date"><em>2024-11-05</em></p>
 </div>
 <div id="remesas" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">1</span> REMESAS<a href="remesas.html#remesas" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -331,20 +322,6 @@ gitbook.start({
 });
 </script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    var src = "true";
-    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:")
-      if (/^https?:/.test(src))
-        src = src.replace(/^https?:/, '');
-    script.src = src;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
 </body>
 
 </html>

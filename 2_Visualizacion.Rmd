@@ -1,4 +1,3 @@
-
 # DESCRIPCIÓN DE LAS SERIES DE TIEMPO
 
 A continuación se presenta la base incluyendo la variable en el tiempo, la aproximación en promedios móviles, en rezagos y en estacionalidad. Todo lo anterior, a través de funciones y gráficas que permitan detectar patrones y ciclos de la variable.
