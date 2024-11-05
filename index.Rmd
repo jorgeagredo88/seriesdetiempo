@@ -1,0 +1,16 @@
+---
+title: "Series de tiempo - Remesas"
+author: "Analisis de Series de Tiempo 
+        Grupo 5 - William Contreras, 
+                  Camilo Espinoza, 
+                  Jorge Agredo"
+date: "`r Sys.Date()`"
+documentclass: book
+output:
+  bookdown::gitbook:
+    config:
+      toc:
+        collapse: section
+  bookdown::pdf_book: default
+---
+

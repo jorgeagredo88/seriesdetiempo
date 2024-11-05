@@ -1,0 +1,302 @@
+# PREPROCESAMIENTO Y VISUALIZACION
+
+```{r include=FALSE, echo=FALSE}
+
+library(TTR)
+library(zoo)
+library(tseries)
+library(ggplot2)
+library(gridExtra)
+library(forecast)
+library(tsoutliers)
+
+```
+
+
+## Descomposición de la serie temporal - Serie de tiempo por Fecha de Pago
+
+
+### Estacionariedad
+
+En el primer paso se verifica que la serie sea estacionaria a traves de la prueba Dickey-Fuller Aumentada (ADF). 
+
+```{r echo=FALSE}
+
+adf_test <- adf.test(serie_ts)
+print(adf_test)
+
+```
+
+
+El resultado de la prueba Dickey-Fuller Aumentada (ADF) tiene un p-valor de 0.01, lo cual indica que la serie es **estacionaria** por lo cual no requiere realizar una diferenciación en la serie.
+
+
+1. **Estadístico de Dickey-Fuller = -7.4**: Este es el valor calculado para el estadístico de prueba. Un valor más negativo tiende a indicar estacionariedad, ya que refuerza el rechazo de la hipótesis nula de no estacionariedad.
+
+2. **p-value = 0.01**: Este p-valor es bajo (generalmente menor a 0.05 es un umbral común para significancia). Dado que el p-valor es 0.01, puedes rechazar la hipótesis nula de no estacionariedad con un 99% de confianza. Esto significa que hay una fuerte evidencia de que tu serie es estacionaria.
+
+3. **Alternative hypothesis: stationary**: La hipótesis alternativa de la prueba es que la serie es estacionaria. Dado que el p-valor es bajo, este resultado respalda la hipótesis alternativa, indicando estacionariedad.
+
+En resumen, se puede concluir concluir que la serie es estacionaria con un nivel de confianza alto. Esto significa que sus propiedades estadísticas, como la media y la varianza, se mantienen constantes a lo largo del tiempo, lo cual es un buen punto de partida para aplicar modelos de series de tiempo como ARIMA, que asumen estacionariedad.
+
+
+## Función de Autocorrelación (ACF) y Función de Autocorrelación Parcial (PACF)
+
+```{r echo=FALSE}
+
+# Gráfico ACF
+acf(serie_ts, main = "Función de Autocorrelacion (ACF)", lag.max = 8, ylim = c(-1, 1))
+
+```
+
+```{r echo=FALSE}
+# Gráfico PACF
+pacf(serie_ts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8, ylim = c(-1, 1))
+
+```
+
+A partir de estos gráficos podemos observar cómo los valores de la serie temporal están fuertemente correlacionados con sus propios valores, con valores altos en los rezagos 7 y 1, lo que significa que podria existir una relación directa y fuerte cada 7 días y con el día anterior, lo que podria sugerir un patón estacional semanal.
+
+Dado estas observaciones se podria considerar un modelo con un componente AR de orden 1 y una estacionalidad de 7 periodos.
+
+## Componentes de la Descomposición
+
+```{r echo=FALSE}
+
+# Convertir el objeto 'Datos_FP' en un ts con frecuencia semanal (si aplica)
+fechas <- seq(as.Date("2023-01-01"), as.Date("2024-10-10"), by = "day")
+serie_ts <- zoo(Datos_FP$Monto_USD, order.by = fechas)
+#serie_ts_fo <- zoo(Datos_FO$Monto_USD, order.by = fechas)
+
+# Asegurarnos de que la frecuencia corresponde al periodo deseado
+#serie_ts <- ts(Datos_FP$Monto_USD, frequency = 365, start = c(2023, 1))
+ 
+# Calcula la tendencia usando una media móvil, ajusta el número de periodos según sea necesario
+tendencia <- SMA(Datos_FP$Monto_USD, n = 30) # Media móvil de 30 días
+ 
+# Calcula la estacionalidad (residuo de los datos menos la tendencia)
+estacionalidad <- Datos_FP$Monto_USD - tendencia
+ 
+# Promedia por semana para capturar un patrón estacional semanal
+estacionalidad_media <- tapply(estacionalidad, as.POSIXlt(fechas)$yday %% 7, mean, na.rm = TRUE)
+estacionalidad <- rep(estacionalidad_media, length.out = length(Datos_FP$Monto_USD))
+ 
+# Calcula el residuo (parte aleatoria)
+residuo <- Datos_FP$Monto_USD - tendencia - estacionalidad
+ 
+
+
+df_componentes <- data.frame(
+  Fecha = fechas,
+  Datos = Datos_FP$Monto_USD,
+  Tendencia = tendencia,
+  Estacionalidad = estacionalidad,
+  Residuo = residuo
+)
+ 
+# Graficar cada componente usando ggplot2
+ggplot(df_componentes, aes(x = Fecha)) + 
+  geom_line(aes(y = Datos)) + 
+  labs(title = "Data", y = "data")
+ 
+ggplot(df_componentes, aes(x = Fecha)) + 
+  geom_line(aes(y = Estacionalidad)) + 
+  labs(title = "Estacionalidad", y = "seasonal")
+ 
+ggplot(df_componentes, aes(x = Fecha)) + 
+  geom_line(aes(y = Tendencia)) + 
+  labs(title = "Tendencia", y = "trend")
+ 
+ggplot(df_componentes, aes(x = Fecha)) + 
+  geom_line(aes(y = Residuo)) + 
+  labs(title = "Residuo", y = "remainder")
+```
+
+A partir de los gráficos anteriores se puede establecer que la serie tiene una tendencia creciente que sugiere un aumento en el valor de las remesas en dólares a lo largo del tiempo.
+
+La estacionalidad es clara y repetitiva, lo que indica un patrón cíclico que se mantiene constante en intensidad y el residuo muestra variaciones adicionales, algunas de las cuales pueden corresponder a eventos aleatorios o no modelados.
+
+
+## Modelo ARIMA
+
+A partir de la información anterior, se contruyó un modelo ARIMA con una estacionalidad de 7 periodos.
+
+
+```{r echo=FALSE}
+serie_tsp <- ts(serie_ts, frequency = 7)
+modelo_arima <- auto.arima(serie_tsp, seasonal = TRUE)
+summary(modelo_arima)
+
+```
+
+**Modelo ARIMA(1,0,0)(2,1,0)[7] con drift**
+
+**Coeficientes del Modelo**
+Los coeficientes estimados del modelo son:
+
+- **AR(1) = 0.2815**: El coeficiente autorregresivo de primer orden indica que el valor actual de la serie está influenciado en un 28.15% por su valor anterior inmediato.
+
+- **SAR(1)** = -0.6143 y **SAR(2)** = -0.3077: Estos son los coeficientes de los componentes autorregresivos estacionales de primer y segundo orden, aplicados en ciclos de 7 periodos. Un valor negativo sugiere que existe una correlación inversa entre los valores actuales y los valores de hace 7 y 14 periodos, lo cual es típico de series con patrones estacionales donde los valores tienden a "compensarse" con valores de periodos anteriores.
+
+- **Drift (Tendencia)** = 5326.433: El drift indica una tendencia general en la serie hacia un crecimiento en promedio de 5326.433 unidades por periodo. La presencia de este valor significa que la serie presenta una tendencia al alza que no es capturada completamente por los componentes AR y SAR.
+
+-**Errores Estándar (s.e.)**: Cada coeficiente tiene un error estándar asociado, lo cual indica la precisión de la estimación. Errores estándar bajos (como los de este modelo) sugieren estimaciones confiables.
+
+**Medidas de Bondad de Ajuste**
+
+-**sigma^2** = 2.614e+12: Es la varianza residual del modelo, una medida de la dispersión de los residuos. Cuanto más bajo es este valor, mejor es el ajuste del modelo.
+
+-**Log likelihood** = -10088.61: Este es el logaritmo de la verosimilitud del modelo. Modelos con mayor (menos negativo) log-likelihood generalmente se ajustan mejor a los datos.
+
+- **AIC** = 20187.21, **AICc** = 20187.31, **BIC** = 20209.54:
+
+Estas son métricas de información que penalizan la complejidad del modelo.
+En general, valores más bajos de AIC y BIC sugieren un mejor equilibrio entre ajuste y simplicidad del modelo, en comparación con otros modelos.
+
+**Medidas de Error en el Conjunto de Entrenamiento**
+
+Estas medidas reflejan el error promedio del modelo en el conjunto de datos de entrenamiento:
+
+-**ME (Mean Error)** = -1837.392: Un valor cercano a 0 indica que el modelo no tiene un sesgo significativo. En este caso, el error medio es bajo y negativo, lo que sugiere un ligero sesgo hacia subestimar los valores.
+
+-**RMSE (Root Mean Squared Error)** = 1603135: Representa la magnitud promedio del error, penalizando más los errores grandes. Un valor más bajo indica un mejor ajuste del modelo.
+
+-**MAE (Mean Absolute Error)** = 1080672: La media de los errores absolutos. Este es el error promedio sin considerar el signo del error, y sugiere el error medio absoluto del modelo.
+
+-**MPE (Mean Percentage Error)** = -8.664%: El porcentaje de error medio muestra que el modelo, en promedio, subestima los valores en un 8.66%.
+
+-**MAPE (Mean Absolute Percentage Error)** = 21.84%: Este valor indica que, en promedio, el modelo tiene un error del 21.84% respecto a los valores reales. Valores de MAPE menores al 20% suelen considerarse buenos, por lo que un 21.84% indica un ajuste razonable.
+
+-**MASE (Mean Absolute Scaled Error)** = 0.7726: Este valor compara el MAE del modelo con el de un modelo naive (que asume que los valores actuales son iguales a los anteriores). Un valor menor a 1 indica que el modelo se desempeña mejor que el modelo naive.
+
+-**ACF1** = -0.03796: La autocorrelación en el primer desfase de los residuos es cercana a 0, lo cual sugiere que el modelo ha capturado bien la autocorrelación en la serie y que los residuos son, en gran medida, ruido blanco (es decir, no tienen patrones de autocorrelación significativos).
+
+En general este modelo ARIMA(1,0,0)(2,1,0)[7] con drift tiene un ajuste razonable para la serie, los residuos muestran poca autocorrelación (ACF1 cercano a 0), lo cual es un buen indicio.
+La presencia de un componente de drift (tendencia) sugiere un aumento constante en la serie, que el modelo trata de capturar.
+Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cual sugiere un ajuste decente, aunque aún podría mejorarse para reducir el MAPE.
+
+
+## Punto de cambio de la serie de tiempo
+
+
+```{r echo=FALSE}
+# Instalar el paquete changepoint si no lo tienes
+#install.packages("changepoint")
+
+# Cargar el paquete
+library(changepoint)
+
+
+# Supongamos que tienes tu serie de tiempo 'serie_ts'
+# Aplicar cpt.mean para detectar cambios en la media
+punto_cambio <- cpt.mean(serie_ts)
+
+# Mostrar los resultados
+summary(punto_cambio)
+
+
+```
+
+
+
+Segn los resultados obtenidos, se detectó **un punto de cambio** en la serie de tiempo.
+
+
+1. **Changepoint type**: Define el tipo de cambio detectado. En este caso, es **un cambio en la media** de la serie (`Change in mean`), lo que implica que la función `cpt.mean` buscó variaciones significativas en el nivel promedio de los datos.
+
+2. **Method of analysis: AMOC**: El método `AMOC` (At Most One Change) implica que el análisis se ha limitado a identificar solo un posible cambio en la serie de tiempo.
+
+3. **Test Statistic: Normal**: La estadística de prueba utilizada para detectar el cambio es el test de normalidad, adecuado para datos que siguen una distribución normal.
+
+4. **Type of penalty: MBIC with value, 19.4263**: La penalización aplicada es la `MBIC` (Modified Bayesian Information Criterion), que ayuda a determinar la ubicación del cambio sin sobreajustar el modelo. El valor específico de esta penalización fue 19.4263, lo cual afecta el número de cambios detectados al favorecer soluciones con menos cambios.
+
+5. **Minimum Segment Length: 1**: Indica que la longitud mínima de un segmento entre los puntos de cambio es 1. Es decir, el análisis considera que el cambio puede ocurrir incluso en segmentos de un solo punto.
+
+6. **Maximum no. of cpts: 1**: Se limitó el número máximo de puntos de cambio a 1, lo cual es consistente con el método `AMOC` usado en el análisis.
+
+7. **Changepoint Locations: 456**: El único punto de cambio detectado se encuentra en la posición 456 de la serie de tiempo. Esto significa que se encontró un cambio significativo en la media en esa posición específica de la serie.
+
+
+
+```{r echo=FALSE}
+
+# Graficar la serie de tiempo con los puntos de cambio
+plot(punto_cambio, main = "Puntos de cambio en la Media")
+
+
+```
+
+## Predicciones del Modelo ARIMA
+
+Como parte del ejercicio se realiza la predicción de 12 días.
+
+```{r echo=FALSE}
+predicciones <- forecast(modelo_arima, h = 12)  #'h' indica cuántos períodos quieras predecir
+print(predicciones)
+
+```
+
+```{r echo=FALSE}
+plot(predicciones, main = "Predicción, 12 días")
+```
+
+## Validaciones
+
+### Outliers
+
+```{r echo=FALSE}
+z_scores <- (serie_tsp - mean(serie_tsp, na.rm = TRUE)) / sd(serie_tsp, na.rm = TRUE)
+umbral <- 2
+outliers_z <- which(abs(z_scores) > umbral)
+outliers_valores <- serie_tsp[outliers_z]
+
+plot(serie_tsp, type = "l", main = "Detección de Outliers con Z-score", ylab = "Valor", xlab = "Tiempo")
+points(outliers_z, outliers_valores, col = "red", pch = 19)
+legend("topright", legend = "Outliers", col = "red", pch = 19)
+```
+
+### Supuestos de una ARIMA
+
+#### Media cero de los residuos
+
+```{r echo=FALSE}
+t_test_residuos <- t.test(residuos, mu = 0)
+print(t_test_residuos)
+```
+
+Con este resultado se puede decir que no hay evidencia suficiente para rechazar la hipótesis nula de que la media de los residuos es 0.
+
+#### Independencia de los residuos
+
+```{r echo=FALSE}
+Box.test(residuals(modelo_arima), lag = 7, type = "Ljung-Box")
+```
+
+La prueba de Ljung-Box evalúa si los residuos del modelo ARIMA están autocorrelacionados. Esto es importante porque, idealmente, los residuos deberían comportarse como ruido blanco para indicar que el modelo ha capturado adecuadamente la estructura de la serie de tiempo. 
+
+El p-valor es menor que 0.05, lo que sugiere que hay suficiente evidencia para rechazar la hipótesis nula de independencia de los residuos, indicando que los residuos del modelo aún presentan autocorrelación significativa en al menos uno de los primeros 7 rezagos.
+
+El test de Ljung-Box sugiere que aún queda información estructural en los residuos que el modelo no ha capturado.
+
+
+#### Normalidad de los residuos
+
+
+```{r echo=FALSE}
+
+shapiro.test(residuals(modelo_arima))
+hist(residuals(modelo_arima), main = "Histograma de Residuos", xlab = "Residuos")
+
+```
+
+**Gráfico Q-Q (Quantile-Quantile)**
+
+```{r echo=FALSE}
+qqnorm(residuals(modelo_arima))
+qqline(residuals(modelo_arima), col = "red")
+```
+
+Un valor p menor que 0.05 indica que se rechaza la hipótesis nula de normalidad, por lo que los residuos no siguen una distribución normal.
+
+Se debe buscar cual es la distribución de ajuste,se podría intentar una distribución t ya que es la más parecida visualmente tiene colas más pesadas que la normal, lo cual puede capturar mejor los valores extremos.
+
