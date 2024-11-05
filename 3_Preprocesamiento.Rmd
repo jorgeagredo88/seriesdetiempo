@@ -33,7 +33,7 @@ print(adf_test)
 ```
 
 
-El resultado de la prueba Dickey-Fuller Aumentada (ADF) tiene un p-valor de 0,01, lo cual indica que la serie es **estacionaria** por lo cual no requiere realizar una diferenciación en la serie.
+El resultado de la prueba Dickey-Fuller Aumentada (ADF) tiene un p-valor de 0.01, lo cual indica que la serie es **estacionaria** por lo cual no requiere realizar una diferenciación en la serie.
 
 
 1. **Estadístico de Dickey-Fuller = -7.4**: Este es el valor calculado para el estadístico de prueba. Un valor más negativo tiende a indicar estacionariedad, ya que refuerza el rechazo de la hipótesis nula de no estacionariedad.
