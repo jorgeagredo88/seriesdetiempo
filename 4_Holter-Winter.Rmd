@@ -1,0 +1,31 @@
+# Holter-Winter
+
+Aplicación de la metodología Holter-Winter y de suavizamiento a la variable tiempo
+
+
+```{r echo=FALSE}
+library(zoo)
+library(forecast)
+
+serie_semanal <- aggregate(serie_ts, as.Date(cut(index(serie_ts), "week")), mean)
+
+# Convertir la serie semanal a un objeto de clase 'ts' con frecuencia anual de 52
+serie_semanal_ts <- ts(serie_semanal, frequency = 52, start = c(2023, 1))
+
+# Crear el modelo de suavizamiento exponencial sin componente estacional
+modelo_hw <- ets(serie_semanal_ts, model = "AAN")  # AAN: Additive error, Additive trend, No seasonality
+
+# Generar el pronóstico para las próximas 8 semanas
+pronostico <- forecast(modelo_hw, h = 8)
+
+# Mostrar el pronóstico y graficar
+print(pronostico)
+plot(pronostico)
+
+```
+
+
+
+**ets para suavizamiento exponencial sin estacionalidad.**
+
+Este modelo predice la serie sin estacionalidad, pero aún permite capturar la tendencia de los datos a lo largo del tiempo, lo cual es adecuado si la serie es corta o no presenta patrones estacionales claros.

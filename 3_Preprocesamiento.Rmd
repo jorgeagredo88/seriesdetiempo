@@ -260,7 +260,7 @@ legend("topright", legend = "Outliers", col = "red", pch = 19)
 #### Media cero de los residuos
 
 ```{r echo=FALSE}
-t_test_residuos <- t.test(residuos, mu = 0)
+t_test_residuos <- t.test(residuals(modelo_arima), mu = 0)
 print(t_test_residuos)
 ```
 

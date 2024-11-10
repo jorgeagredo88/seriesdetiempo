@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas</title>
   <meta name="description" content="3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas" />
-  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
   <meta property="og:title" content="3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo" />
 
 
-<meta name="date" content="2024-11-05" />
+<meta name="date" content="2024-11-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,7 +31,7 @@
   
   
 <link rel="prev" href="descripción-de-las-series-de-tiempo.html"/>
-
+<link rel="next" href="holter-winter.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -66,7 +66,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -177,6 +177,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.7.2" data-path="preprocesamiento-y-visualizacion.html"><a href="preprocesamiento-y-visualizacion.html#supuestos-de-una-arima"><i class="fa fa-check"></i><b>3.7.2</b> Supuestos de una ARIMA</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="4" data-path="holter-winter.html"><a href="holter-winter.html"><i class="fa fa-check"></i><b>4</b> Holter-Winter</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -208,7 +209,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  Augmented Dickey-Fuller Test
 ## 
 ## data:  serie_ts
-## Dickey-Fuller = -7.4395, Lag order = 8, p-value = 0.01
+## Dickey-Fuller = -7.4089, Lag order = 8, p-value = 0.01
 ## alternative hypothesis: stationary</code></pre>
 <p>El resultado de la prueba Dickey-Fuller Aumentada (ADF) tiene un p-valor de 0.01, lo cual indica que la serie es <strong>estacionaria</strong> por lo cual no requiere realizar una diferenciación en la serie.</p>
 <ol style="list-style-type: decimal">
@@ -240,15 +241,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 
 ## Coefficients:
 ##          ar1     sar1     sar2     drift
-##       0.2815  -0.6143  -0.3077  5326.433
-## s.e.  0.0381   0.0377   0.0378  6623.015
+##       0.2856  -0.6158  -0.3103  5325.258
+## s.e.  0.0381   0.0377   0.0377  6663.866
 ## 
-## sigma^2 = 2.614e+12:  log likelihood = -10088.61
-## AIC=20187.21   AICc=20187.31   BIC=20209.54
+## sigma^2 = 2.627e+12:  log likelihood = -10090.17
+## AIC=20190.34   AICc=20190.44   BIC=20212.67
 ## 
 ## Training set error measures:
 ##                     ME    RMSE     MAE       MPE     MAPE      MASE        ACF1
-## Training set -1837.392 1603135 1080672 -8.664026 21.83807 0.7725551 -0.03796145</code></pre>
+## Training set -1831.682 1607013 1084512 -8.691848 21.92267 0.7719142 -0.03913131</code></pre>
 <p><strong>Modelo ARIMA(1,0,0)(2,1,0)[7] con drift</strong></p>
 <p><strong>Coeficientes del Modelo</strong>
 Los coeficientes estimados del modelo son:</p>
@@ -305,18 +306,18 @@ Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cu
 <h2><span class="header-section-number">3.6</span> Predicciones del Modelo ARIMA<a href="preprocesamiento-y-visualizacion.html#predicciones-del-modelo-arima" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Como parte del ejercicio se realiza la predicción de 12 días.</p>
 <pre><code>##          Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95
-## 93.71429        9189632 7117496.1 11261768 6020573.7 12358690
-## 93.85714        7602795 5450134.5  9755456 4310584.8 10895005
-## 94.00000        2702625  543712.3  4861537 -599146.9  6004396
-## 94.14286        9665693 7506285.8 11825100 6363164.8 12968221
-## 94.28571        9868239 7708793.1 12027685 6565651.4 13170827
-## 94.42857        9326637 7167187.8 11486086 6024044.4 12629230
-## 94.57143        9242555 7083105.4 11402004 5939961.9 12545148
-## 94.71429        9558880 7256181.8 11861579 6037206.8 13080554
-## 94.85714        7797606 5483937.2 10111276 4259154.7 11336058
-## 95.00000        2817606  503069.5  5132142 -722172.0  6357383
-## 95.14286        9979586 7664980.6 12294190 6439702.8 13519468
-## 95.28571       10440257 8125646.5 12754867 6900365.8 13980148</code></pre>
+## 93.71429        9184204 7107055.4 11261352 6007479.4 12360929
+## 93.85714        7598607 5438378.7  9758835 4294822.9 10902391
+## 94.00000        2700759  533892.4  4867626 -613177.5  6014695
+## 94.14286        9661864 7494456.3 11829271 6347100.2 12976627
+## 94.28571        9861905 7694453.4 12029356 6547073.9 13176736
+## 94.42857        9321229 7153773.9 11488684 6006392.5 12636065
+## 94.57143        9239938 7072483.0 11407394 5925101.4 12554775
+## 94.71429        9554357 7244521.0 11864193 6021767.8 13086946
+## 94.85714        7793031 5471963.3 10114099 4243264.2 11342798
+## 95.00000        2816478  494495.9  5138460 -734687.1  6367643
+## 95.14286        9979647 7657590.8 12301704 6428368.4 13530926
+## 95.28571       10443129 8121066.3 12765191 6891840.6 13994417</code></pre>
 <p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 </div>
 <div id="validaciones" class="section level2 hasAnchor" number="3.7">
@@ -332,14 +333,14 @@ Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cu
 <pre><code>## 
 ##  One Sample t-test
 ## 
-## data:  residuos
-## t = -0.029176, df = 648, p-value = 0.9767
+## data:  residuals(modelo_arima)
+## t = -0.029015, df = 648, p-value = 0.9769
 ## alternative hypothesis: true mean is not equal to 0
 ## 95 percent confidence interval:
-##  -125501.1  121826.3
+##  -125794.6  122131.2
 ## sample estimates:
 ## mean of x 
-## -1837.392</code></pre>
+## -1831.682</code></pre>
 <p>Con este resultado se puede decir que no hay evidencia suficiente para rechazar la hipótesis nula de que la media de los residuos es 0.</p>
 </div>
 <div id="independencia-de-los-residuos" class="section level4 hasAnchor" number="3.7.2.2">
@@ -348,7 +349,7 @@ Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cu
 ##  Box-Ljung test
 ## 
 ## data:  residuals(modelo_arima)
-## X-squared = 23.707, df = 7, p-value = 0.001282</code></pre>
+## X-squared = 24.483, df = 7, p-value = 0.0009367</code></pre>
 <p>La prueba de Ljung-Box evalúa si los residuos del modelo ARIMA están autocorrelacionados. Esto es importante porque, idealmente, los residuos deberían comportarse como ruido blanco para indicar que el modelo ha capturado adecuadamente la estructura de la serie de tiempo.</p>
 <p>El p-valor es menor que 0.05, lo que sugiere que hay suficiente evidencia para rechazar la hipótesis nula de independencia de los residuos, indicando que los residuos del modelo aún presentan autocorrelación significativa en al menos uno de los primeros 7 rezagos.</p>
 <p>El test de Ljung-Box sugiere que aún queda información estructural en los residuos que el modelo no ha capturado.</p>
@@ -359,7 +360,7 @@ Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cu
 ##  Shapiro-Wilk normality test
 ## 
 ## data:  residuals(modelo_arima)
-## W = 0.9336, p-value &lt; 2.2e-16</code></pre>
+## W = 0.93444, p-value = 2.848e-16</code></pre>
 <p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p><strong>Gráfico Q-Q (Quantile-Quantile)</strong></p>
 <p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
@@ -375,8 +376,8 @@ Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cu
           </div>
         </div>
       </div>
-<a href="descripción-de-las-series-de-tiempo.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="descripción-de-las-series-de-tiempo.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="holter-winter.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
