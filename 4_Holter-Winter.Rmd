@@ -1,6 +1,5 @@
 # HOLT - WINTERS
 
-Aplicación de la metodología Holter-Winter y de suavizamiento a la variable tiempo
 
 ```{r echo=FALSE}
 #install.packages("TSA")
