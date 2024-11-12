@@ -1,0 +1,89 @@
+# Holter-Winter
+
+Aplicación de la metodología Holter-Winter y de suavizamiento a la variable tiempo
+
+
+```{r echo=FALSE}
+#install.packages("TSA")
+library(zoo)
+library(forecast)
+library(TSA)
+library(ggplot2)
+
+head(Datos_FP)
+plot(Datos_FP)
+```
+
+
+```{r echo=FALSE}
+Datos_FP_ts <- ts(Datos_FP$Monto_USD, start = c(2023, 1), frequency = 365)
+head(Datos_FP_ts,20)
+```
+
+
+Caracteristicas de la serie.
+
+
+```{r echo=FALSE}
+class(Datos_FP_ts)
+start(Datos_FP_ts)
+end(Datos_FP_ts)
+frequency(Datos_FP_ts)
+summary(Datos_FP_ts)
+
+
+plot(Datos_FP_ts)
+abline(reg=lm(Datos_FP_ts ~ time(Datos_FP_ts)))
+
+```
+
+
+
+```{r echo=FALSE}
+#install.packages("lubridate")
+library(lubridate)
+
+## BOXPLOT
+Datos_FP$Dia_semana <- wday(Datos_FP$Fecha_Pago, label = TRUE, abbr = TRUE)
+ggplot(Datos_FP, aes(x = Dia_semana, y = Monto_USD)) +
+  geom_boxplot(fill = "skyblue", color = "darkblue") +
+  labs(title = "Boxplot del Monto USD por Día de la Semana",
+       x = "Día de la Semana",
+       y = "Monto USD") +
+  theme_minimal()
+
+plot(log(Datos_FP_ts), ylab = "log(Monto USD)",
+    xlab = "Fecha",
+    main = "Logaritmo de Monto en Dolares")
+
+```
+
+
+
+
+```{r echo=FALSE}
+
+## MODELO HOLT - WINTER
+
+Datos_FP_zoo <- zoo(log(Datos_FP$Monto_USD), 
+                    order.by = as.Date(Datos_FP$Fecha_Pago))
+Datos_FP_ts2 <- ts(coredata(Datos_FP_zoo), frequency = 7, start = c(2023, 1))
+modeloHW1 <- HoltWinters(Datos_FP_ts2, seasonal = "additive")
+
+
+plot(modeloHW1, main = "Ajuste con Holt - Winters", 
+     xlab = "Fecha", 
+     ylab = "Log (Monto en Dolares)")
+
+
+plot(zoo(fitted(modeloHW1), order.by = index(Datos_FP_zoo)), 
+     main = "Descomposición con HW", 
+     xlab = "Fecha", 
+     ylab = "Log (Monto en Dolares)")
+
+### PREDICCIÓN
+
+pred <- predict(modeloHW1,14, prediction.interval = TRUE)
+pred
+
+```

@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Series de tiempo - Remesas</title>
-  <meta name="description" content="Series de tiempo - Remesas" />
+  <title>4 Holter-Winter | Series de tiempo - Remesas</title>
+  <meta name="description" content="4 Holter-Winter | Series de tiempo - Remesas" />
   <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Series de tiempo - Remesas" />
+  <meta property="og:title" content="4 Holter-Winter | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Series de tiempo - Remesas" />
+  <meta name="twitter:title" content="4 Holter-Winter | Series de tiempo - Remesas" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="preprocesamiento-y-visualizacion.html"/>
 
-<link rel="next" href="descripción-de-las-series-de-tiempo.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -198,78 +198,62 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Series de tiempo - Remesas</h1>
-<p class="author"><em>Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo</em></p>
-<p class="date"><em>2024-11-11</em></p>
-</div>
-<div id="remesas" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> REMESAS<a href="remesas.html#remesas" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="introducción" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> INTRODUCCIÓN<a href="remesas.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Las remesas son transferencias de dinero realizadas principalmente por emigrantes a sus familiares o relacionados en su país de origen. En este proceso participan los siguientes actores: remitente (persona que desde el país de origen se acerca a un agente para enviar un determinado monto), el agente en el lugar de origen (oficina donde se inicia la operación financiera), la empresa de transferencia de dinero (empresa que hace el traslado del monto del país de origen al país destino), el agente en el lugar de pago (oficina donde se realiza el desembolso del dinero) y el receptor (persona que en el país de destino recibe el dinero). Las transferencias entre la empresa de transferencia y los agentes se realizan en dólares, y las tasas de cambio se fijan en la fecha de origen de la transacción con una tasa de referencia establecida para cada país. Esto significa que todas las transacciones
-iniciadas en el día 𝑡 se pagarán según la tasa de referencia correspondiente a ese día.</p>
-<p>Esto genera un desafío para los agentes en el lugar de pago, dado que la tasa de pago asociada a las operaciones es informada al remitente y se fija según la tasa de referencia vigente en la fecha de origen y se mantiene inalterada hasta que el giro es cobrado. Existe una exposición a la volatilidad de la tasa de cambio entre el día inicial de la transacción
-y la fecha de cobro.</p>
-<p>Estas transacciones se identifican el día en que se realiza el pago al receptor, momento en que la tasa de mercado a la que el agente de pago convierte a moneda local los dólares recibidos por la empresa de transferencia de dinero puede haber variado con relación a la tasa de cambio con la que se fijó la conversión al momento de la originación de la remesa.</p>
-<p>En resumen, hay transacciones pagadas en el día 𝑡 que tienen como referencia una tasa de cambio de un día diferente, y el agente del lugar de pago puede monetizar (convertir de dólares a pesos colombianos) a la tasa del día 𝑡. De esta forma, en escenarios de revaluación del peso colombiano, es decir, caídas en la tasa de cambio, se generarían menores ingresos o pérdidas por concepto de monetización de dólares, materializándose el riesgo cambiario. Este proceso se ve afectado por las celebraciones especiales en cada uno de los países, tales como día de amor y amistad, día de la madre, navidad, etc.</p>
-</div>
-<div id="base-de-datos" class="section level2 hasAnchor" number="1.2">
-<h2><span class="header-section-number">1.2</span> BASE DE DATOS<a href="remesas.html#base-de-datos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Según lo expuesto anteriormente, se identifican las siguientes variables para el conjunto de datos provisto por una entidad que realiza remesas en Colombia bajo acuerdo de confidencialidad:</p>
-<table style="width:83%;">
-<colgroup>
-<col width="36%" />
-<col width="47%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td align="left"><ul>
-<li><strong>Fecha de pago.</strong></li>
-</ul></td>
-<td align="left"><ul>
-<li><strong>Canal.</strong></li>
-</ul></td>
-</tr>
-<tr class="even">
-<td align="left"><ul>
-<li><strong>Pais de Origen.</strong></li>
-</ul></td>
-<td align="left"><ul>
-<li><strong>Número de
-transacciones.</strong></li>
-</ul></td>
-</tr>
-<tr class="odd">
-<td align="left"><ul>
-<li><strong>Fecha de
-origen.</strong></li>
-</ul></td>
-<td align="left"><ul>
-<li><strong>Monto en dolares.</strong></li>
-</ul></td>
-</tr>
-<tr class="even">
-<td align="left"><ul>
-<li><strong>Monto en Pesos.</strong></li>
-</ul></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p>En relación con la importancia de analizar esta información enfocado en la variable tiempo se puede decir que; el análisis de las variables de tipo fecha (Fecha origen de la operación y Fecha de pago) es crucial debido a la volatilidad de las tasas de cambio entre el día en que se origina la remesa y el día en que se paga. Por otra parte, el pronóstico del monto
-total a pagar en remesas es esencial para mitigar este riesgo, permitiendo anticipar posibles pérdidas por variaciones en la tasa de cambio y tomar decisiones informadas sobre cobertura y gestión del riesgo.</p>
-<p>Inicialmente los datos comprenden el periodo entre el primero de enero de 2023 hasta el 10 de octubre de 2024 de forma díaria, pero se irá aumentando los datos en la medida que la empresa entregue la información.</p>
+<div id="holter-winter" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Holter-Winter<a href="holter-winter.html#holter-winter" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Aplicación de la metodología Holter-Winter y de suavizamiento a la variable tiempo</p>
+<pre><code>##   Fecha_Pago Monto_USD
+## 1 2023-01-01  314473.1
+## 2 2023-01-02 4700346.1
+## 3 2023-01-03 6069974.1
+## 4 2023-01-04 6164948.9
+## 5 2023-01-05 6986643.0
+## 6 2023-01-06 6616416.0</code></pre>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<pre><code>## Time Series:
+## Start = c(2023, 1) 
+## End = c(2023, 20) 
+## Frequency = 365 
+##  [1]  314473.1 4700346.1 6069974.1 6164948.9 6986643.0 6616416.0 5392530.2 1368008.4 2248875.5
+## [10] 8307518.8 6546327.3 4509599.3 5737621.1 4668733.8 1329182.5 6681862.6 5926830.6 5664752.1
+## [19] 5235327.5 5645884.9</code></pre>
+<p>Caracteristicas de la serie.</p>
+<pre><code>## [1] &quot;ts&quot;</code></pre>
+<pre><code>## [1] 2023    1</code></pre>
+<pre><code>## [1] 2024  284</code></pre>
+<pre><code>## [1] 365</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+##   314473  5732341  7045531  6592872  8074062 13866707</code></pre>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-40-1.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-40-2.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-41-1.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-41-2.png" width="672" /></p>
+<pre><code>## Time Series:
+## Start = c(2115, 6) 
+## End = c(2117, 5) 
+## Frequency = 7 
+##               fit      upr      lwr
+## 2115.714 16.11265 16.67574 15.54956
+## 2115.857 15.88687 16.45135 15.32240
+## 2116.000 14.82100 15.38687 14.25512
+## 2116.143 16.06591 16.63320 15.49862
+## 2116.286 16.14283 16.71154 15.57411
+## 2116.429 16.04821 16.61837 15.47805
+## 2116.571 16.03847 16.61008 15.46686
+## 2116.714 16.11836 16.70473 15.53200
+## 2116.857 15.89259 16.48040 15.30478
+## 2117.000 14.82671 15.41599 14.23744
+## 2117.143 16.07162 16.66238 15.48087
+## 2117.286 16.14854 16.74079 15.55629
+## 2117.429 16.05392 16.64768 15.46017
+## 2117.571 16.04418 16.63946 15.44891</code></pre>
 
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
+<a href="preprocesamiento-y-visualizacion.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="descripción-de-las-series-de-tiempo.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -300,7 +284,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/USERNAME/REPO/edit/BRANCH/1_Base_de_datos.Rmd",
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/4_Holter-Winter.Rmd",
 "text": "Edit"
 },
 "history": {

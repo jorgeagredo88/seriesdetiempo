@@ -22,7 +22,7 @@ En el primer paso se verifica que la serie sea estacionaria a traves de la prueb
 
 ```{r echo=FALSE}
 
-adf_test <- adf.test(serie_ts)
+adf_test <- adf.test(serie_xts)
 print(adf_test)
 
 ```
@@ -45,13 +45,13 @@ En resumen, se puede concluir concluir que la serie es estacionaria con un nivel
 ```{r echo=FALSE}
 
 # Gráfico ACF
-acf(serie_ts, main = "Función de Autocorrelacion (ACF)", lag.max = 8, ylim = c(-1, 1))
+acf(serie_xts, main = "Función de Autocorrelacion (ACF)", lag.max = 8, ylim = c(-1, 1))
 
 ```
 
 ```{r echo=FALSE}
 # Gráfico PACF
-pacf(serie_ts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8, ylim = c(-1, 1))
+pacf(serie_xts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8, ylim = c(-1, 1))
 
 ```
 
@@ -65,11 +65,11 @@ Dado estas observaciones se podria considerar un modelo con un componente AR de 
 
 # Convertir el objeto 'Datos_FP' en un ts con frecuencia semanal (si aplica)
 fechas <- seq(as.Date("2023-01-01"), as.Date("2024-10-10"), by = "day")
-serie_ts <- zoo(Datos_FP$Monto_USD, order.by = fechas)
-#serie_ts_fo <- zoo(Datos_FO$Monto_USD, order.by = fechas)
+serie_xts <- zoo(Datos_FP$Monto_USD, order.by = fechas)
+#serie_xts_fo <- zoo(Datos_FO$Monto_USD, order.by = fechas)
 
 # Asegurarnos de que la frecuencia corresponde al periodo deseado
-#serie_ts <- ts(Datos_FP$Monto_USD, frequency = 365, start = c(2023, 1))
+#serie_xts <- ts(Datos_FP$Monto_USD, frequency = 365, start = c(2023, 1))
  
 # Calcula la tendencia usando una media móvil, ajusta el número de periodos según sea necesario
 tendencia <- SMA(Datos_FP$Monto_USD, n = 30) # Media móvil de 30 días
@@ -123,8 +123,8 @@ A partir de la información anterior, se contruyó un modelo ARIMA con una estac
 
 
 ```{r echo=FALSE}
-serie_tsp <- ts(serie_ts, frequency = 7)
-modelo_arima <- auto.arima(serie_tsp, seasonal = TRUE)
+serie_xtsp <- ts(serie_xts, frequency = 7)
+modelo_arima <- auto.arima(serie_xtsp, seasonal = TRUE)
 summary(modelo_arima)
 
 ```
@@ -187,9 +187,9 @@ Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cu
 library(changepoint)
 
 
-# Supongamos que tienes tu serie de tiempo 'serie_ts'
+# Supongamos que tienes tu serie de tiempo 'serie_xts'
 # Aplicar cpt.mean para detectar cambios en la media
-punto_cambio <- cpt.mean(serie_ts)
+punto_cambio <- cpt.mean(serie_xts)
 
 # Mostrar los resultados
 summary(punto_cambio)
@@ -245,12 +245,12 @@ plot(predicciones, main = "Predicción, 12 días")
 ### Outliers
 
 ```{r echo=FALSE}
-z_scores <- (serie_tsp - mean(serie_tsp, na.rm = TRUE)) / sd(serie_tsp, na.rm = TRUE)
+z_scores <- (serie_xtsp - mean(serie_xtsp, na.rm = TRUE)) / sd(serie_xtsp, na.rm = TRUE)
 umbral <- 2
 outliers_z <- which(abs(z_scores) > umbral)
-outliers_valores <- serie_tsp[outliers_z]
+outliers_valores <- serie_xtsp[outliers_z]
 
-plot(serie_tsp, type = "l", main = "Detección de Outliers con Z-score", ylab = "Valor", xlab = "Tiempo")
+plot(serie_xtsp, type = "l", main = "Detección de Outliers con Z-score", ylab = "Valor", xlab = "Tiempo")
 points(outliers_z, outliers_valores, col = "red", pch = 19)
 legend("topright", legend = "Outliers", col = "red", pch = 19)
 ```
@@ -260,7 +260,7 @@ legend("topright", legend = "Outliers", col = "red", pch = 19)
 #### Media cero de los residuos
 
 ```{r echo=FALSE}
-t_test_residuos <- t.test(residuos, mu = 0)
+t_test_residuos <- t.test(residuals(modelo_arima), mu = 0)
 print(t_test_residuos)
 ```
 
