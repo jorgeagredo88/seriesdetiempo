@@ -141,7 +141,7 @@ pred
 La tabla muestra cómo el modelo de Holt-Winters estima las fluctuaciones diarias del monto en dólares en los próximos 14 días, reflejando una variabilidad ligera. Los intervalos ayudan a interpretar la predicción en función de su incertidumbre, lo que es clave para evaluar posibles escenarios en los valores futuros de los pagos.
 
 
-## funcion exponencial para regtresar a la escala original.
+## Funcion exponencial para regresar a la escala original.
 
 ```{r echo=FALSE}
 # Convertir 'pred' a un data frame si es necesario
