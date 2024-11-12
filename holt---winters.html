@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Series de tiempo - Remesas</title>
-  <meta name="description" content="Series de tiempo - Remesas" />
+  <title>4 HOLT - WINTERS | Series de tiempo - Remesas</title>
+  <meta name="description" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
   <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Series de tiempo - Remesas" />
+  <meta property="og:title" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Series de tiempo - Remesas" />
+  <meta name="twitter:title" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="preprocesamiento-y-visualizacion.html"/>
 
-<link rel="next" href="descripción-de-las-series-de-tiempo.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -209,68 +209,112 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Series de tiempo - Remesas</h1>
-<p class="author"><em>Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo</em></p>
-<p class="date"><em>2024-11-11</em></p>
+<div id="holt---winters" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> HOLT - WINTERS<a href="holt---winters.html#holt---winters" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Aplicación de la metodología Holter-Winter y de suavizamiento a la variable tiempo</p>
+<pre><code>##   Fecha_Pago Monto_USD
+## 1 2023-01-01  314473.1
+## 2 2023-01-02 4700346.1
+## 3 2023-01-03 6069974.1
+## 4 2023-01-04 6164948.9
+## 5 2023-01-05 6986643.0
+## 6 2023-01-06 6616416.0</code></pre>
+<div id="visualizacion-de-la-variación-de-los-pagos-a-lo-largo-del-tiempo" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Visualizacion de la variación de los pagos a lo largo del tiempo<a href="holt---winters.html#visualizacion-de-la-variación-de-los-pagos-a-lo-largo-del-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
 </div>
-<div id="remesas" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> REMESAS<a href="remesas.html#remesas" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="introducción" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> INTRODUCCIÓN<a href="remesas.html#introducción" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Las remesas son transferencias de dinero realizadas principalmente por emigrantes a sus familiares o relacionados en su país de origen. En este proceso participan los siguientes actores: remitente (persona que desde el país de origen se acerca a un agente para enviar un determinado monto), el agente en el lugar de origen (oficina donde se inicia la operación financiera), la empresa de transferencia de dinero (empresa que hace el traslado del monto del país de origen al país destino), el agente en el lugar de pago (oficina donde se realiza el desembolso del dinero) y el receptor (persona que en el país de destino recibe el dinero). Las transferencias entre la empresa de transferencia y los agentes se realizan en dólares, y las tasas de cambio se fijan en la fecha de origen de la transacción con una tasa de referencia establecida para cada país. Esto significa que todas las transacciones
-iniciadas en el día 𝑡 se pagarán según la tasa de referencia correspondiente a ese día.</p>
-<p>Esto genera un desafío para los agentes en el lugar de pago, dado que la tasa de pago asociada a las operaciones es informada al remitente y se fija según la tasa de referencia vigente en la fecha de origen y se mantiene inalterada hasta que el giro es cobrado. Existe una exposición a la volatilidad de la tasa de cambio entre el día inicial de la transacción
-y la fecha de cobro.</p>
-<p>Estas transacciones se identifican el día en que se realiza el pago al receptor, momento en que la tasa de mercado a la que el agente de pago convierte a moneda local los dólares recibidos por la empresa de transferencia de dinero puede haber variado con relación a la tasa de cambio con la que se fijó la conversión al momento de la originación de la remesa.</p>
-<p>En resumen, hay transacciones pagadas en el día 𝑡 que tienen como referencia una tasa de cambio de un día diferente, y el agente del lugar de pago puede monetizar (convertir de dólares a pesos colombianos) a la tasa del día 𝑡. De esta forma, en escenarios de revaluación del peso colombiano, es decir, caídas en la tasa de cambio, se generarían menores ingresos o pérdidas por concepto de monetización de dólares, materializándose el riesgo cambiario. Este proceso se ve afectado por las celebraciones especiales en cada uno de los países, tales como día de amor y amistad, día de la madre, navidad, etc.</p>
+<div id="definición-y-caracteristicas-de-la-serie." class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Definición y caracteristicas de la serie.<a href="holt---winters.html#definición-y-caracteristicas-de-la-serie." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<pre><code>## Time Series:
+## Start = c(2023, 1) 
+## End = c(2023, 20) 
+## Frequency = 365 
+##  [1]  314473.1 4700346.1 6069974.1 6164948.9 6986643.0 6616416.0 5392530.2 1368008.4 2248875.5
+## [10] 8307518.8 6546327.3 4509599.3 5737621.1 4668733.8 1329182.5 6681862.6 5926830.6 5664752.1
+## [19] 5235327.5 5645884.9</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+##   314473  5732341  7045531  6592872  8074062 13866707</code></pre>
+<p>La serie de tiempo <code>Datos_FP_ts</code> muestra el comportamiento de los montos de pago en dólares registrados diariamente desde enero de 2023.</p>
+<ul>
+<li><strong>Valor mínimo (Min)</strong>: El monto más bajo registrado es de <strong>314,473 USD</strong>.</li>
+<li><strong>Primer cuartil (1st Qu.)</strong>: El 25% de los montos registrados son menores o iguales a <strong>5,732,341 USD</strong>.</li>
+<li><strong>Mediana (Median)</strong>: El valor central de la serie es <strong>7,045,531 USD</strong>, lo que indica que la mitad de los montos son mayores o iguales a este valor y la otra mitad son menores.</li>
+<li><strong>Media (Mean)</strong>: El promedio de los montos es de <strong>6,592,872 USD</strong>, lo cual está relativamente cerca de la mediana, sugiriendo que no hay una gran asimetría en los datos.</li>
+<li><strong>Tercer cuartil (3rd Qu.)</strong>: El 75% de los montos son menores o iguales a <strong>8,074,062 USD</strong>.</li>
+<li><strong>Valor máximo (Max)</strong>: El monto máximo registrado es de <strong>13,866,707 USD</strong>.</li>
+</ul>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 </div>
-<div id="base-de-datos" class="section level2 hasAnchor" number="1.2">
-<h2><span class="header-section-number">1.2</span> BASE DE DATOS<a href="remesas.html#base-de-datos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Según lo expuesto anteriormente, se identifican las siguientes variables para el conjunto de datos provisto por una entidad que realiza remesas en Colombia bajo acuerdo de confidencialidad:</p>
-<table style="width:83%;">
-<colgroup>
-<col width="36%" />
-<col width="47%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td align="left"><ul>
-<li><strong>Fecha de pago.</strong></li>
-</ul></td>
-<td align="left"><ul>
-<li><strong>Canal.</strong></li>
-</ul></td>
-</tr>
-<tr class="even">
-<td align="left"><ul>
-<li><strong>Pais de Origen.</strong></li>
-</ul></td>
-<td align="left"><ul>
-<li><strong>Número de
-transacciones.</strong></li>
-</ul></td>
-</tr>
-<tr class="odd">
-<td align="left"><ul>
-<li><strong>Fecha de
-origen.</strong></li>
-</ul></td>
-<td align="left"><ul>
-<li><strong>Monto en dolares.</strong></li>
-</ul></td>
-</tr>
-<tr class="even">
-<td align="left"><ul>
-<li><strong>Monto en Pesos.</strong></li>
-</ul></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p>En relación con la importancia de analizar esta información enfocado en la variable tiempo se puede decir que; el análisis de las variables de tipo fecha (Fecha origen de la operación y Fecha de pago) es crucial debido a la volatilidad de las tasas de cambio entre el día en que se origina la remesa y el día en que se paga. Por otra parte, el pronóstico del monto
-total a pagar en remesas es esencial para mitigar este riesgo, permitiendo anticipar posibles pérdidas por variaciones en la tasa de cambio y tomar decisiones informadas sobre cobertura y gestión del riesgo.</p>
-<p>Inicialmente los datos comprenden el periodo entre el primero de enero de 2023 hasta el 10 de octubre de 2024 de forma díaria, pero se irá aumentando los datos en la medida que la empresa entregue la información.</p>
+<div id="gráfico-de-caja-boxplot-por-día-de-la-semana" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> Gráfico de Caja (Boxplot) por Día de la Semana<a href="holt---winters.html#gráfico-de-caja-boxplot-por-día-de-la-semana" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p>El gráfico de cajas muestra la distribución de los montos en dólares (Monto_USD) para cada día de la semana (Dia_semana). El es comparar los montos de pago en función del día de la semana para identificar variaciones, como si ciertos días tienden a tener pagos más altos o más bajos.</p>
+<p>En este caso, es notable que el dia domingo se registran valores mas bajos en comparación con los demas dias de la semana.</p>
+</div>
+<div id="logaritmo-de-monto-en-dolares" class="section level2 hasAnchor" number="4.4">
+<h2><span class="header-section-number">4.4</span> Logaritmo de Monto en Dolares<a href="holt---winters.html#logaritmo-de-monto-en-dolares" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>El siguiente grafico permite visualizar la evolución de los pagos en el tiempo, facilitando la observación de cambios y patrones en la serie al suavizar la variabilidad de los datos.</p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+</div>
+<div id="aplicacion-del-modelo-holt-winter" class="section level2 hasAnchor" number="4.5">
+<h2><span class="header-section-number">4.5</span> Aplicacion del modelo Holt-Winter<a href="holt---winters.html#aplicacion-del-modelo-holt-winter" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>A continuación se utiliza una serie de tiempo transformada a escala logarítmica para aplicar el modelo de Holt-Winters para ajustar y descomponer la serie.</p>
+<p>Se aplica el modelo de Holt-Winters con un componente estacional aditivo (seasonal = “additive”) a la serie Datos_FP_ts2. El modelo de Holt-Winters es un método de suavizamiento exponencial que se utiliza para ajustar y pronosticar series de tiempo con componentes estacionales, tendencia y aleatoriedad.</p>
+<p><strong>Estacionalidad aditiva:</strong> Se asume que los efectos estacionales son constantes y no dependen del nivel de la serie.</p>
+</div>
+<div id="gráfico-del-ajuste-del-modelo-de-holt-winters" class="section level2 hasAnchor" number="4.6">
+<h2><span class="header-section-number">4.6</span> Gráfico del Ajuste del Modelo de Holt-Winters<a href="holt---winters.html#gráfico-del-ajuste-del-modelo-de-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+</div>
+<div id="gráfico-de-la-descomposición-de-holt-winters" class="section level2 hasAnchor" number="4.7">
+<h2><span class="header-section-number">4.7</span> Gráfico de la Descomposición de Holt-Winters<a href="holt---winters.html#gráfico-de-la-descomposición-de-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+</div>
+<div id="predicciones-a-partir-del-modelo-de-holt-winters" class="section level2 hasAnchor" number="4.8">
+<h2><span class="header-section-number">4.8</span> Predicciones a partir del modelo de Holt-Winters<a href="holt---winters.html#predicciones-a-partir-del-modelo-de-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<pre><code>## Time Series:
+## Start = c(2115, 6) 
+## End = c(2117, 5) 
+## Frequency = 7 
+##               fit      upr      lwr
+## 2115.714 16.11265 16.67574 15.54956
+## 2115.857 15.88687 16.45135 15.32240
+## 2116.000 14.82100 15.38687 14.25512
+## 2116.143 16.06591 16.63320 15.49862
+## 2116.286 16.14283 16.71154 15.57411
+## 2116.429 16.04821 16.61837 15.47805
+## 2116.571 16.03847 16.61008 15.46686
+## 2116.714 16.11836 16.70473 15.53200
+## 2116.857 15.89259 16.48040 15.30478
+## 2117.000 14.82671 15.41599 14.23744
+## 2117.143 16.07162 16.66238 15.48087
+## 2117.286 16.14854 16.74079 15.55629
+## 2117.429 16.05392 16.64768 15.46017
+## 2117.571 16.04418 16.63946 15.44891</code></pre>
+<p>La tabla muestra cómo el modelo de Holt-Winters estima las fluctuaciones diarias del monto en dólares en los próximos 14 días, reflejando una variabilidad ligera. Los intervalos ayudan a interpretar la predicción en función de su incertidumbre, lo que es clave para evaluar posibles escenarios en los valores futuros de los pagos.</p>
+</div>
+<div id="funcion-exponencial-para-regtresar-a-la-escala-original." class="section level2 hasAnchor" number="4.9">
+<h2><span class="header-section-number">4.9</span> funcion exponencial para regtresar a la escala original.<a href="holt---winters.html#funcion-exponencial-para-regtresar-a-la-escala-original." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<pre><code>##         fit      upr     lwr
+## 1   9945695 17465553 5663540
+## 2   7935638 13955019 4512667
+## 3   2733240  4813200 1552107
+## 4   9491504 16738052 5382266
+## 5  10250405 18102176 5804319
+## 6   9325010 16491689 5272706
+## 7   9234597 16355581 5213987
+## 8  10002685 17979182 5564976
+## 9   7981110 14366357 4433840
+## 10  2748902  4955400 1524895
+## 11  9545892 17233686 5287554
+## 12 10309141 18639424 5701807
+## 13  9378444 16982250 5179244
+## 14  9287513 16843192 5121232</code></pre>
+<p>Esta salida muestra las predicciones y los intervalos de confianza de un modelo de serie de tiempo para el monto en dólares. Cada fila representa un día.</p>
+<p><strong><code>fit</code></strong>: Valor predicho central en dólares. Es el valor estimado para el monto en este periodo.
+<strong><code>upr</code></strong>: Límite superior del intervalo de predicción en dólares. Representa el valor máximo esperado en ese intervalo, proporcionando un margen de incertidumbre hacia arriba.
+<strong><code>lwr</code></strong>: Límite inferior del intervalo de predicción en dólares. Indica el valor mínimo esperado, estableciendo el margen de incertidumbre hacia abajo.</p>
+<p>Este intervalo entre <code>upr</code> y <code>lwr</code> ayuda a entender la variabilidad y la confiabilidad de la predicción en cada periodo.</p>
 
 </div>
 </div>
@@ -279,8 +323,8 @@ total a pagar en remesas es esencial para mitigar este riesgo, permitiendo antic
           </div>
         </div>
       </div>
+<a href="preprocesamiento-y-visualizacion.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="descripción-de-las-series-de-tiempo.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -311,7 +355,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/USERNAME/REPO/edit/BRANCH/1_Base_de_datos.Rmd",
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/4_Holter-Winter.Rmd",
 "text": "Edit"
 },
 "history": {

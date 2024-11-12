@@ -1,7 +1,6 @@
-# Holter-Winter
+# HOLT - WINTERS
 
 Aplicación de la metodología Holter-Winter y de suavizamiento a la variable tiempo
-
 
 ```{r echo=FALSE}
 #install.packages("TSA")
@@ -11,39 +10,57 @@ library(TSA)
 library(ggplot2)
 
 head(Datos_FP)
+```
+
+## Visualizacion de la variación de los pagos a lo largo del tiempo
+
+```{r echo=FALSE}
 plot(Datos_FP)
 ```
 
+## Definición y caracteristicas de la serie.
 
 ```{r echo=FALSE}
 Datos_FP_ts <- ts(Datos_FP$Monto_USD, start = c(2023, 1), frequency = 365)
 head(Datos_FP_ts,20)
 ```
 
-
-Caracteristicas de la serie.
-
-
 ```{r echo=FALSE}
-class(Datos_FP_ts)
-start(Datos_FP_ts)
-end(Datos_FP_ts)
-frequency(Datos_FP_ts)
+#class(Datos_FP_ts)
+#start(Datos_FP_ts)
+#end(Datos_FP_ts)
+#frequency(Datos_FP_ts)
 summary(Datos_FP_ts)
-
-
-plot(Datos_FP_ts)
-abline(reg=lm(Datos_FP_ts ~ time(Datos_FP_ts)))
 
 ```
 
+La serie de tiempo `Datos_FP_ts` muestra el comportamiento de los montos de pago en dólares registrados diariamente desde enero de 2023.
 
+-   **Valor mínimo (Min)**: El monto más bajo registrado es de **314,473 USD**.
+-   **Primer cuartil (1st Qu.)**: El 25% de los montos registrados son menores o iguales a **5,732,341 USD**.
+-   **Mediana (Median)**: El valor central de la serie es **7,045,531 USD**, lo que indica que la mitad de los montos son mayores o iguales a este valor y la otra mitad son menores.
+-   **Media (Mean)**: El promedio de los montos es de **6,592,872 USD**, lo cual está relativamente cerca de la mediana, sugiriendo que no hay una gran asimetría en los datos.
+-   **Tercer cuartil (3rd Qu.)**: El 75% de los montos son menores o iguales a **8,074,062 USD**.
+-   **Valor máximo (Max)**: El monto máximo registrado es de **13,866,707 USD**.
+
+
+
+```{r echo=FALSE}
+plot(Datos_FP_ts)
+abline(reg=lm(Datos_FP_ts ~ time(Datos_FP_ts)))
+```
+
+
+
+
+## Gráfico de Caja (Boxplot) por Día de la Semana
 
 ```{r echo=FALSE}
 #install.packages("lubridate")
 library(lubridate)
 
 ## BOXPLOT
+#Creación de la Variable Dia_semana
 Datos_FP$Dia_semana <- wday(Datos_FP$Fecha_Pago, label = TRUE, abbr = TRUE)
 ggplot(Datos_FP, aes(x = Dia_semana, y = Monto_USD)) +
   geom_boxplot(fill = "skyblue", color = "darkblue") +
@@ -51,39 +68,100 @@ ggplot(Datos_FP, aes(x = Dia_semana, y = Monto_USD)) +
        x = "Día de la Semana",
        y = "Monto USD") +
   theme_minimal()
-
-plot(log(Datos_FP_ts), ylab = "log(Monto USD)",
-    xlab = "Fecha",
-    main = "Logaritmo de Monto en Dolares")
-
 ```
 
 
+El gráfico de cajas muestra la distribución de los montos en dólares (Monto_USD) para cada día de la semana (Dia_semana). El es comparar los montos de pago en función del día de la semana para identificar variaciones, como si ciertos días tienden a tener pagos más altos o más bajos.
+
+En este caso, es notable que el dia domingo se registran valores mas bajos en comparación con los demas dias de la semana.
+
+
+
+## Logaritmo de Monto en Dolares
+
+El siguiente grafico permite visualizar la evolución de los pagos en el tiempo, facilitando la observación de cambios y patrones en la serie al suavizar la variabilidad de los datos.
 
 
 ```{r echo=FALSE}
+plot(log(Datos_FP_ts), ylab = "log(Monto USD)",
+    xlab = "Fecha",
+    main = "Logaritmo de Monto en Dolares")
+```
 
+
+## Aplicacion del modelo Holt-Winter
+
+A continuación se utiliza una serie de tiempo transformada a escala logarítmica para aplicar el modelo de Holt-Winters para ajustar y descomponer la serie.
+
+```{r echo=FALSE}
 ## MODELO HOLT - WINTER
-
 Datos_FP_zoo <- zoo(log(Datos_FP$Monto_USD), 
                     order.by = as.Date(Datos_FP$Fecha_Pago))
 Datos_FP_ts2 <- ts(coredata(Datos_FP_zoo), frequency = 7, start = c(2023, 1))
 modeloHW1 <- HoltWinters(Datos_FP_ts2, seasonal = "additive")
 
+```
 
+
+Se aplica el modelo de Holt-Winters con un componente estacional aditivo (seasonal = "additive") a la serie Datos_FP_ts2. El modelo de Holt-Winters es un método de suavizamiento exponencial que se utiliza para ajustar y pronosticar series de tiempo con componentes estacionales, tendencia y aleatoriedad.
+
+
+**Estacionalidad aditiva:** Se asume que los efectos estacionales son constantes y no dependen del nivel de la serie.
+
+
+## Gráfico del Ajuste del Modelo de Holt-Winters
+
+```{r echo=FALSE}
 plot(modeloHW1, main = "Ajuste con Holt - Winters", 
      xlab = "Fecha", 
      ylab = "Log (Monto en Dolares)")
+```
 
 
+
+## Gráfico de la Descomposición de Holt-Winters
+
+```{r echo=FALSE}
 plot(zoo(fitted(modeloHW1), order.by = index(Datos_FP_zoo)), 
      main = "Descomposición con HW", 
      xlab = "Fecha", 
      ylab = "Log (Monto en Dolares)")
+```
+
+## Predicciones a partir del modelo de Holt-Winters
+
+```{r echo=FALSE}
 
 ### PREDICCIÓN
-
 pred <- predict(modeloHW1,14, prediction.interval = TRUE)
 pred
+```
+
+
+La tabla muestra cómo el modelo de Holt-Winters estima las fluctuaciones diarias del monto en dólares en los próximos 14 días, reflejando una variabilidad ligera. Los intervalos ayudan a interpretar la predicción en función de su incertidumbre, lo que es clave para evaluar posibles escenarios en los valores futuros de los pagos.
+
+
+## funcion exponencial para regtresar a la escala original.
+
+```{r echo=FALSE}
+# Convertir 'pred' a un data frame si es necesario
+pred_df <- as.data.frame(pred)
+
+# Aplicar la función exponencial para volver a la escala original
+pred_df$fit <- exp(pred_df$fit)
+pred_df$upr <- exp(pred_df$upr)
+pred_df$lwr <- exp(pred_df$lwr)
+
+# Visualizar las predicciones en la escala original
+pred_df
+
 
 ```
+
+Esta salida muestra las predicciones y los intervalos de confianza de un modelo de serie de tiempo para el monto en dólares. Cada fila representa un día.
+
+**`fit`**: Valor predicho central en dólares. Es el valor estimado para el monto en este periodo.
+**`upr`**: Límite superior del intervalo de predicción en dólares. Representa el valor máximo esperado en ese intervalo, proporcionando un margen de incertidumbre hacia arriba.
+**`lwr`**: Límite inferior del intervalo de predicción en dólares. Indica el valor mínimo esperado, estableciendo el margen de incertidumbre hacia abajo.
+
+Este intervalo entre `upr` y `lwr` ayuda a entender la variabilidad y la confiabilidad de la predicción en cada periodo.
