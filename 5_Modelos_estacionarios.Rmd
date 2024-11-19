@@ -1,0 +1,235 @@
+# MODELOS ESTACIONARIOS
+
+```{r echo=FALSE}
+#install.packages("TSA")
+library(zoo)
+library(forecast)
+library(TSA)
+library(ggplot2)
+
+head(Datos_FP)
+```
+
+## METODOLOGÍA BOX-JENKINS
+
+### Visualizacion de la serie
+
+```{r echo=FALSE}
+# Visualización inicial
+plot(Datos_FP_ts, main = "Serie de tiempo de Monto en USD", ylab = "Monto (USD)", xlab = "Tiempo", col = "blue")
+```
+
+### Verificación de estacionariedad
+
+```{r echo=FALSE, warning=FALSE}
+# Prueba de estacionariedad
+library(tseries)
+adf.test(Datos_FP_ts) # Prueba de Dickey-Fuller aumentada
+
+```
+
+### Análisis ACF y PACF
+
+```{r echo=FALSE}
+# Gráficos ACF y PACF
+acf(Datos_FP_ts, main = "Función de Autocorrelacion (ACF)", lag.max = 8)
+pacf(Datos_FP_ts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8)
+
+```
+
+### Ajuste del modelo
+
+```{r echo=FALSE, warning=FALSE}
+# Ajustar modelo ARIMA automáticamente
+library(forecast)
+summary(modelo_arima)
+```
+
+### Pronóstico
+
+```{r echo=FALSE}
+#predicciones <- forecast(modelo_arima, h = 12)  #'h' indica cuántos períodos quieras predecir
+print(predicciones)
+```
+
+## INCLUCIÓN DE VARIABLES EN EL TIEMPO Y AJUSTES A UN MODELO LINEAL Y ESTACIONARIO
+
+### Creación de variables temporales a partir de la fecha de pago
+
+Se crean las variables Dia_Anio, Mes, Semana y Es_Fin_de_Semana
+
+```{r echo=FALSE}
+# Crear variables temporales a partir de la fecha
+Datos_FP$Fecha_Pago <- as.Date(Datos_FP$Fecha_Pago)  # Asegurarte de que esté en formato Date
+Datos_FP$Dia_Anio <- as.numeric(format(Datos_FP$Fecha_Pago, "%j"))  # Día del año
+Datos_FP$Mes <- as.numeric(format(Datos_FP$Fecha_Pago, "%m"))       # Mes
+Datos_FP$Semana <- as.numeric(format(Datos_FP$Fecha_Pago, "%U"))    # Semana del año
+Datos_FP$Es_Fin_de_Semana <- ifelse(weekdays(Datos_FP$Fecha_Pago) %in% c("sábado", "domingo"), 1, 0)
+```
+
+### Verificacion de la misma cobertura de fechas de las dos fuentes.
+
+Para combinar datos adicionales con la serie de tiempo y usarlos como regresores en un modelo, es fundamental asegurarque los datos Datos_FP están correctamente alineados con el índice temporal de la serie Datos_FP_ts
+
+```{r echo=FALSE}
+head(Datos_FP$Fecha_Pago)
+start(Datos_FP_ts)
+```
+
+### Agregar las variables al índice de la serie
+
+```{r}
+# Crear un índice de fechas para la serie
+Datos_FP$Fecha_Pago <- as.Date(Datos_FP$Fecha_Pago)
+
+# Alinear la serie con las fechas de Datos_FP
+serie_alineada <- ts(Datos_FP$Monto_USD, start = c(2023, 1), frequency = 365)
+```
+
+### Unión de las variables adicionales
+
+```{r}
+# Fusionar la serie de tiempo con las variables adicionales
+library(dplyr)
+
+# Asegúrate de que las fechas de la serie correspondan a las de Datos_FP
+datos_combinados <- Datos_FP %>%
+  mutate(Datos_FP_ts = serie_alineada) %>%
+  select(Fecha_Pago, Datos_FP_ts, Dia_Anio, Mes, Semana, Es_Fin_de_Semana)
+
+```
+
+### Preparar
+
+Se extraen las columnas de las variables adicionales que se usaran como regresores usando xreg.
+
+```{r echo=FALSE}
+# Extraer las variables adicionales para xreg
+xreg <- datos_combinados[, c("Dia_Anio", "Mes", "Semana", "Es_Fin_de_Semana")]
+
+# Convertir a matriz numérica
+xreg <- as.matrix(xreg)
+
+```
+
+### Ajuste del modelo ARIMAX Con los datos combinados y xreg.
+
+```{r echo=FALSE, warning=FALSE}
+library(forecast)
+
+modelo_arimax <- auto.arima(serie_alineada, xreg = xreg)
+summary(modelo_arimax)
+
+```
+
+El resultado obtenido del ajuste del modelo ARIMA con variables exógenas (`SARIMAX`) proporciona varios indicadores y coeficientes:
+
+### **Resumen de los Coeficientes:**
+
+-   **AR(1) y AR(2)**: Estos son los coeficientes del modelo autorregresivo (AR), que indican cómo los valores pasados de la serie temporal (el valor en el tiempo $t-1$ y $t-2$) influyen en el valor actual.
+    Los coeficientes son:
+
+    -   $\text{AR(1)} = 0.1203$
+    -   $\text{AR(2)} = -0.0724$ Estos valores sugieren una relación débil entre los valores pasados de la serie temporal y el valor actual (dado que ambos coeficientes son relativamente pequeños).
+
+-   **MA(1)**: Coeficiente del modelo de medias móviles; refleja cómo los errores pasados (residuos) afectan los valores actuales.
+    El coeficiente es:
+
+    -   $\text{MA(1)} = -0.9823$ Esto indica que los errores pasados tienen una fuerte influencia sobre la predicción actual.
+
+-   **Drift**: Este término representa una tendencia en los datos.
+    Un valor negativo -5053.713 puede indicar que hay una tendencia decreciente a lo largo del tiempo.
+
+-   **Variables exógenas**:
+
+    -   **Dia_Anio**: El coeficiente $506543.96$ sugiere que el día del año tiene una relación positiva con la variable dependiente, aunque el valor es extremadamente grande, lo que podría indicar una escala incorrecta o un outlier en esos datos.
+    -   **Mes**: El coeficiente $1409040.8$ también es grande, lo que sugiere una fuerte influencia de la variable mes en la serie temporal.
+    -   **Semana**: El coeficiente $-3792392.0$ es negativo y bastante grande en valor absoluto, lo que implica que las semanas tienen un impacto considerable pero contrario al comportamiento de la variable dependiente.
+    -   **Es_Fin_de_Semana**: El coeficiente $-3260731.8$ indica que, si es fin de semana, la variable dependiente tiende a ser más baja (dado que es negativo).
+
+-   **Errores estándar (s.e.)**: Los errores estándar asociados a cada coeficiente indican la variabilidad de las estimaciones.
+    Si el coeficiente es mucho mayor que el error estándar, el coeficiente es más significativo.
+
+------------------------------------------------------------------------
+
+### **Métricas del Modelo:**
+
+-   $\sigma^2 = 2.477e+12$: Este es el estimado de la varianza del error (residual).
+    Un valor muy grande podría sugerir que hay alta variabilidad en los residuos y que el modelo no captura toda la variabilidad en los datos.
+
+-   **Log-likelihood = -10163.4**: El logaritmo de la verosimilitud se utiliza para evaluar el ajuste del modelo.
+    Un valor más alto (menos negativo) indica un mejor ajuste.
+
+-   **AIC = 20344.79**: El **Akaike Information Criterion** (AIC) penaliza la complejidad del modelo (número de parámetros) y ayuda a elegir el modelo más parsimonioso (el que ajusta bien pero con menos parámetros).
+    En general, cuanto menor es el AIC, mejor es el modelo.
+
+-   **AICc = 20345.07**: Este es el AIC corregido para el tamaño de la muestra, lo cual es útil cuando el número de observaciones es pequeño en relación con el número de parámetros del modelo.
+
+-   **BIC = 20385.06**: El **Bayesian Information Criterion** (BIC) es similar al AIC, pero penaliza aún más la complejidad del modelo.
+    Un valor más bajo es preferible.
+
+------------------------------------------------------------------------
+
+### **Errores en el conjunto de entrenamiento:**
+
+Las métricas del modelo sobre el conjunto de entrenamiento son importantes para evaluar el desempeño: - **ME (Mean Error)** = 22500.38: Es el error promedio, que muestra si el modelo tiene un sesgo sistemático.
+En este caso, un valor relativamente alto sugiere que el modelo puede tener un sesgo (tal vez está sobreestimando los valores).
+- **RMSE (Root Mean Squared Error)** = 1,562,845: Mide el error promedio entre los valores observados y los predichos.
+Es bastante alto, lo que sugiere que el modelo no está prediciendo con gran precisión.
+- **MAE (Mean Absolute Error)** = 1,154,910: Similar al RMSE, pero no toma en cuenta la dirección del error.
+También es bastante alto, lo que indica un ajuste no óptimo.
+- **MPE (Mean Percentage Error)** = -11.32: Este valor negativo sugiere que el modelo tiende a subestimar las predicciones en promedio.
+- **MAPE (Mean Absolute Percentage Error)** = 25.60: Es el error absoluto en términos porcentuales.
+En este caso, el modelo tiene un error del 25.6% en promedio, lo cual no es ideal, especialmente si el modelo se aplica en situaciones donde la precisión es crucial.
+- **MASE (Mean Absolute Scaled Error)** = 0.4386: Es una métrica que compara el desempeño del modelo con un modelo simple de referencia (como un modelo que siempre predice la media).
+Un valor menor a 1 indica que el modelo es mejor que el modelo de referencia.
+- **ACF1 (Autocorrelation Function lag 1)** = -0.0004: Indica la correlación entre los residuos en el primer retardo.
+Un valor cercano a cero sugiere que los residuos no están autocorrelacionados, lo cual es una buena señal.
+
+------------------------------------------------------------------------
+
+### Validación
+
+```{r echo=FALSE}
+# Diagnóstico del modelo
+checkresiduals(modelo_arimax)
+
+# Ver importancia de los regresores
+coef(modelo_arimax)
+
+```
+
+### **Ljung-Box test:**
+- **Q* = 917.06, df = 127, p-value < 2.2e-16**: El **Ljung-Box test** se utiliza para verificar si hay autocorrelación en los residuos del modelo. Específicamente, prueba si los residuos están correlacionados en un conjunto de retardos (lags). 
+
+  - **Q* = 917.06**: Este es el estadístico de prueba, que mide la cantidad de autocorrelación en los residuos. 
+  - **df = 127**: Los grados de libertad del test, que se corresponden con los retardos que se han usado en la prueba. En este caso, se han utilizado 130 retardos para evaluar la autocorrelación.
+  - **p-value < 2.2e-16**: El valor p es extremadamente pequeño, lo que indica que **hay evidencia significativa de autocorrelación** en los residuos. En otras palabras, el modelo no está capturando toda la estructura temporal de los datos.
+
+El **Ljung-Box test** con un valor p tan bajo (casi igual a cero) indica que los residuos del modelo no son completamente aleatorios y contienen patrones de autocorrelación no capturados por el modelo. Esto sugiere que el modelo `ARIMAX(2,1,1)` no es totalmente adecuado para los datos, y probablemente hay alguna estructura temporal en los residuos que el modelo no ha logrado ajustar.
+
+### Pronóstico con regresores adicionales.
+
+Al realizar pronósticos, es necesario generar valores futuros para los regresores:
+
+```{r echo=FALSE}
+# Crear las fechas futuras cada 7 días
+fechas_futuras <- seq(from = as.Date("2023-12-31"), by = "7 days", length.out = 30)
+
+# Generar los valores futuros para los regresores
+xreg_futuro <- data.frame(
+  Dia_Anio = as.numeric(format(fechas_futuras, "%j")),   # Día del año
+  Mes = as.numeric(format(fechas_futuras, "%m")),        # Mes del año
+  Semana = as.numeric(format(fechas_futuras, "%U")),     # Semana del año
+  Es_Fin_de_Semana = ifelse(weekdays(fechas_futuras) %in% c("sábado", "domingo"), 1, 0)  # Fines de semana
+)
+
+# Convertir a matriz para el modelo
+xreg_futuro <- as.matrix(xreg_futuro)
+
+# Realizar el pronóstico
+forecast_arimax <- forecast(modelo_arimax, xreg = xreg_futuro, h = 12)
+
+# Graficar el pronóstico
+plot(forecast_arimax)
+```

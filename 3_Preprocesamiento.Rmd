@@ -45,13 +45,21 @@ En resumen, se puede concluir concluir que la serie es estacionaria con un nivel
 ```{r echo=FALSE}
 
 # Gráfico ACF
-acf(serie_xts, main = "Función de Autocorrelacion (ACF)", lag.max = 8, ylim = c(-1, 1))
+acf_result <- acf(serie_xts, main = "Función de Autocorrelación (ACF)", lag.max = 8)
 
+# Ajustar los límites en el gráfico de autocorrelación
+plot(acf_result, ylim = c(-1, 1))
 ```
 
 ```{r echo=FALSE}
 # Gráfico PACF
-pacf(serie_xts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8, ylim = c(-1, 1))
+#pacf(serie_xts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8, ylim = c(-1, 1))
+
+pacf_result <- pacf(serie_xts, main = "Función de Autocorrelacion Parcial (PACF)", lag.max = 8)
+
+# Ajustar los límites en el gráfico de autocorrelación
+plot(pacf_result, ylim = c(-1, 1))
+
 
 ```
 
