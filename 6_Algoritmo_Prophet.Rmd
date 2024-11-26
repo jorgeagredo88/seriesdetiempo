@@ -6,81 +6,178 @@ Una propuesta reciente es el modelo Prophet, disponible a través del paquete fa
 
 ```{r echo=FALSE, warning=FALSE}
 #install.packages("TSA")
-library(zoo)
-library(forecast)
-library(TSA)
-library(ggplot2)
-library(fpp3)
-
-#head(Datos_FP)
-```
-
-
-
-```{r echo=FALSE}
-# Instalar y cargar las librerías necesarias
+#install.packages("fable")
+#install.packages("tsibble")
 #install.packages("tidyverse")
 #install.packages("readxl")
 #install.packages("googledrive")
 
 library(readxl)
 library(googledrive)
+library(zoo)
+library(forecast)
+library(TSA)
+library(ggplot2)
+library(fpp3)
+library(fable)
+library(tsibble)
+library(dplyr)
+library(tidyverse)
+library(tseries)
+
+
+#head(Datos_FP)
+```
+
+## Datos 
+
+Con el objetivo de realizar el ejercicio planteado se utilizará la serie de montos en dolares de remesas por fecha de pago y la tasa representativa del mercado cambiario para Colombia.
+
+```{r echo=FALSE}
+
 
 archivo_e6 <- drive_get("Tasas_cambio_nominales.xlsx")
 drive_download(archivo_e6, path = "Tasas_cambio_nominales.xlsx", overwrite = TRUE)
 TRM <- read_excel("Tasas_cambio_nominales.xlsx")
-print(TRM)
-#Datos_FP1=Datos_FP()
 
 Datos_FP1 <- Datos_FP[, !names(Datos_FP) %in% c("Dia_semana","Dia_Anio", "Mes", "Semana", "Es_Fin_de_Semana")]
-
-```
-
-
-
-```{r echo=FALSE}
 
 Datos_TRM <- Datos_FP1 %>%
   left_join(TRM, by = c("Fecha_Pago" = "Fecha"))
 
 head(Datos_TRM)
+
 ```
 
+Se verifica el tipo de variable de los datos
 
 ```{r echo=FALSE}
-library(tseries)
+str(Datos_TRM)
 
-# Convertir las columnas a series temporales con frecuencia diaria
+```
+
+Inicialmente se verifica la estacionariedad de las variables Monto USD y TRM.
+
+```{r echo=FALSE}
+
 Monto_USD_ts <- ts(Datos_TRM$Monto_USD, frequency = 365, start = c(2023, 1))
 TRM_ts <- ts(Datos_TRM$TRM, frequency = 365, start = c(2023, 1))
-```
 
-
-```{r echo=FALSE}
-# Realizar prueba de Dickey-Fuller Aumentada para verificar estacionariedad
 adf_monto <- adf.test(Monto_USD_ts, alternative = "stationary")
 adf_trm <- adf.test(TRM_ts, alternative = "stationary")
+
 ```
 
+
 ```{r echo=FALSE}
-# Imprimir resultados de las pruebas
 cat("Prueba ADF para Monto_USD:\n")
 print(adf_monto)
 ```
+
 ```{r echo=FALSE}
 cat("\nPrueba ADF para TRM:\n")
 print(adf_trm)
 ```
+
+Una vez verificado que ambas series son estacionarias, se procede a graficarlas en el tiempo,
+
 ```{r echo=FALSE}
 library(ggplot2)
 #install.packages("tidyr")
 library(tidyr)
-#Datos_TRM %>%
- # pivot_longer(c(Monto_USD, TRM),
-               #names_to = "var", values_to = "value") %>%
-  #ggplot(aes(x = Quarter, y = value)) +
- # geom_line() +
-  #facet_grid(vars(var), scales = "free_y") +
-  #labs(title = "Monto en dolares de remesas y TRM",
-       #y = "Monto_USD % TRM")
+Datos_TRM %>%
+  pivot_longer(c(Monto_USD, TRM),
+               names_to = "var", values_to = "value") %>%
+  ggplot(aes(x = Fecha_Pago, y = value)) +
+  geom_line() +
+  facet_grid(vars(var), scales = "free_y") +
+  labs(title = "Monto en dolares de remesas y TRM",
+       y = "Monto_USD % TRM")
+
 ```
+
+## Modelo ARIMA 
+
+```{r echo=FALSE}
+
+Datos_TRM$Fecha_Pago <- as.Date(Datos_TRM$Fecha_Pago)
+
+Datos_TRM1 <- Datos_TRM %>%
+  as_tsibble(index = Fecha_Pago)
+
+
+fit <- Datos_TRM1 %>%
+  model(ARIMA(Monto_USD ~ TRM))
+report(fit)
+
+```
+
+<p>Ecuación general:</p>
+<p>
+  \( \text{Monto_USD}_t = \beta_0 + \beta_{\text{TRM}} \cdot \text{TRM}_t + \epsilon_t \)
+</p>
+
+**Relación entre Monto_USD y TRM**:
+
+El coeficiente de TRM sugiere una relación positiva lo que significa que a medida que aumenta el TRM, también lo hace el monto en dólares. Tiene un error estándar alto, indicando que el modelo puede no estar capturando toda la variabilidad en los datos.
+
+La varianza del error residual es alto lo que puede indicar una alta variabilidad en los datos que el modelo no está explicando bien.
+
+## Evaluación de residuos
+
+```{r echo=FALSE}
+bind_rows(
+  `Regression residuals` =
+    as_tibble(residuals(fit, type = "regression")),
+  `ARIMA residuals` =
+    as_tibble(residuals(fit, type = "innovation")),
+  .id = "type"
+) %>%
+  mutate(
+    type = factor(type, levels=c(
+      "Regression residuals", "ARIMA residuals"))
+  ) %>%
+  ggplot(aes(x = Fecha_Pago, y = .resid)) +
+  geom_line() +
+  facet_grid(vars(type))
+
+```
+
+```{r echo=FALSE}
+
+fit %>% gg_tsresiduals()
+
+```
+
+
+```{r echo=FALSE}
+
+augment(fit) %>%
+  features(.innov, ljung_box, dof = 5, lag = 8)
+
+```
+
+Dado que el p valor es superior a 0.05, no hay suficiente evidencia para rechazar la hipotesis nula, lo que significa que los residuos del modelo ARIMA no tienen autocorrelación significativa hasta el lag 8.
+
+Los residuos son consistentes con ruido blanco, lo que sugiere que el modelo captura adecuadamente las dependencias temporales en los datos.
+
+## Predicción 
+
+```{r echo=FALSE}
+
+Datos_TRM_future <- new_data(Datos_TRM_tsibble, 8) %>%
+  mutate(TRM = mean(Datos_TRM$TRM, na.rm = TRUE))  
+
+forecast_fit <- forecast(fit, new_data = Datos_TRM_future)
+
+autoplot(forecast_fit, Datos_TRM_tsibble) +
+  labs(
+    title = "Proyección del Monto en Dólares (Modelo ARIMA)",
+    y = "Monto en USD",
+    x = "Fecha"
+  ) +
+  theme_minimal()
+
+
+```
+

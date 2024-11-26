@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6 MODELO PROPHET | Series de tiempo - Remesas</title>
   <meta name="description" content="6 MODELO PROPHET | Series de tiempo - Remesas" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6 MODELO PROPHET | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
@@ -66,7 +66,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -215,7 +215,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.2.12" data-path="modelos-estacionarios.html"><a href="modelos-estacionarios.html#pronóstico-con-regresores-adicionales."><i class="fa fa-check"></i><b>5.2.12</b> Pronóstico con regresores adicionales.</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="modelo-prophet.html"><a href="modelo-prophet.html"><i class="fa fa-check"></i><b>6</b> MODELO PROPHET</a></li>
+<li class="chapter" data-level="6" data-path="modelo-prophet.html"><a href="modelo-prophet.html"><i class="fa fa-check"></i><b>6</b> MODELO PROPHET</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="modelo-prophet.html"><a href="modelo-prophet.html#datos"><i class="fa fa-check"></i><b>6.1</b> Datos</a></li>
+<li class="chapter" data-level="6.2" data-path="modelo-prophet.html"><a href="modelo-prophet.html#modelo-arima-1"><i class="fa fa-check"></i><b>6.2</b> Modelo ARIMA</a></li>
+<li class="chapter" data-level="6.3" data-path="modelo-prophet.html"><a href="modelo-prophet.html#evaluación-de-residuos"><i class="fa fa-check"></i><b>6.3</b> Evaluación de residuos</a></li>
+<li class="chapter" data-level="6.4" data-path="modelo-prophet.html"><a href="modelo-prophet.html#predicción"><i class="fa fa-check"></i><b>6.4</b> Predicción</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -239,20 +245,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="modelo-prophet" class="section level1 hasAnchor" number="6">
 <h1><span class="header-section-number">6</span> MODELO PROPHET<a href="modelo-prophet.html#modelo-prophet" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Una propuesta reciente es el modelo Prophet, disponible a través del paquete fable.prophet. Este modelo fue introducido por Facebook (S. J. Taylor &amp; Letham, 2018), originalmente para pronosticar datos diarios con estacionalidad semanal y anual, además de efectos de vacaciones. Más tarde se amplió para cubrir más tipos de datos estacionales. Funciona mejor con series temporales que tienen una fuerte estacionalidad y varias temporadas de datos históricos.</p>
-<pre><code>## # A tibble: 649 × 2
-##    Fecha                 TRM
-##    &lt;dttm&gt;              &lt;dbl&gt;
-##  1 2023-01-01 00:00:00 4766.
-##  2 2023-01-02 00:00:00 4766.
-##  3 2023-01-03 00:00:00 4766.
-##  4 2023-01-04 00:00:00 4842.
-##  5 2023-01-05 00:00:00 4924 
-##  6 2023-01-06 00:00:00 4990.
-##  7 2023-01-07 00:00:00 4886.
-##  8 2023-01-08 00:00:00 4886.
-##  9 2023-01-09 00:00:00 4886.
-## 10 2023-01-10 00:00:00 4886.
-## # ℹ 639 more rows</code></pre>
+<div id="datos" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Datos<a href="modelo-prophet.html#datos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Con el objetivo de realizar el ejercicio planteado se utilizará la serie de montos en dolares de remesas por fecha de pago y la tasa representativa del mercado cambiario para Colombia.</p>
 <pre><code>##   Fecha_Pago Monto_USD     TRM
 ## 1 2023-01-01  314473.1 4765.92
 ## 2 2023-01-02 4700346.1 4765.92
@@ -260,12 +255,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4 2023-01-04 6164948.9 4842.26
 ## 5 2023-01-05 6986643.0 4924.00
 ## 6 2023-01-06 6616416.0 4989.58</code></pre>
+<p>Se verifica el tipo de variable de los datos</p>
+<pre><code>## &#39;data.frame&#39;:    649 obs. of  3 variables:
+##  $ Fecha_Pago: POSIXct, format: &quot;2023-01-01&quot; &quot;2023-01-02&quot; &quot;2023-01-03&quot; ...
+##  $ Monto_USD : num  314473 4700346 6069974 6164949 6986643 ...
+##  $ TRM       : num  4766 4766 4766 4842 4924 ...</code></pre>
+<p>Inicialmente se verifica la estacionariedad de las variables Monto USD y TRM.</p>
 <pre><code>## Prueba ADF para Monto_USD:</code></pre>
 <pre><code>## 
 ##  Augmented Dickey-Fuller Test
 ## 
 ## data:  Monto_USD_ts
-## Dickey-Fuller = -7.4089, Lag order = 8, p-value = 0.01
+## Dickey-Fuller = -7.4395, Lag order = 8, p-value = 0.01
 ## alternative hypothesis: stationary</code></pre>
 <pre><code>## 
 ## Prueba ADF para TRM:</code></pre>
@@ -275,7 +276,47 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## data:  TRM_ts
 ## Dickey-Fuller = -1.6842, Lag order = 8, p-value = 0.712
 ## alternative hypothesis: stationary</code></pre>
+<p>Una vez verificado que ambas series son estacionarias, se procede a graficarlas en el tiempo,</p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+</div>
+<div id="modelo-arima-1" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Modelo ARIMA<a href="modelo-prophet.html#modelo-arima-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<pre><code>## Series: Monto_USD 
+## Model: LM w/ ARIMA(1,0,1)(0,1,1)[7] errors 
+## 
+## Coefficients:
+##          ar1      ma1     sma1        TRM
+##       0.8120  -0.5946  -0.9240  1072.2519
+## s.e.  0.0678   0.0849   0.0188   697.0625
+## 
+## sigma^2 estimated as 1.976e+12:  log likelihood=-10003.67
+## AIC=20017.34   AICc=20017.43   BIC=20039.66</code></pre>
+<p>
+Ecuación general:
+</p>
+<p>
+<span class="math inline">\(\text{Monto_USD}_t = \beta_0 + \beta_{\text{TRM}} \cdot \text{TRM}_t + \epsilon_t\)</span>
+</p>
+<p><strong>Relación entre Monto_USD y TRM</strong>:</p>
+<p>El coeficiente de TRM sugiere una relación positiva lo que significa que a medida que aumenta el TRM, también lo hace el monto en dólares. Tiene un error estándar alto, indicando que el modelo puede no estar capturando toda la variabilidad en los datos.</p>
+<p>La varianza del error residual es alto lo que puede indicar una alta variabilidad en los datos que el modelo no está explicando bien.</p>
+</div>
+<div id="evaluación-de-residuos" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Evaluación de residuos<a href="modelo-prophet.html#evaluación-de-residuos" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-72-1.png" width="672" /></p>
+<pre><code>## # A tibble: 1 × 3
+##   .model                 lb_stat lb_pvalue
+##   &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 ARIMA(Monto_USD ~ TRM)    3.27     0.352</code></pre>
+<p>Dado que el p valor es superior a 0.05, no hay suficiente evidencia para rechazar la hipotesis nula, lo que significa que los residuos del modelo ARIMA no tienen autocorrelación significativa hasta el lag 8.</p>
+<p>Los residuos son consistentes con ruido blanco, lo que sugiere que el modelo captura adecuadamente las dependencias temporales en los datos.</p>
+</div>
+<div id="predicción" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Predicción<a href="modelo-prophet.html#predicción" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
 
+</div>
 </div>
             </section>
 

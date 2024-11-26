@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2 DESCRIPCIÓN DE LAS SERIES DE TIEMPO | Series de tiempo - Remesas</title>
   <meta name="description" content="2 DESCRIPCIÓN DE LAS SERIES DE TIEMPO | Series de tiempo - Remesas" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2 DESCRIPCIÓN DE LAS SERIES DE TIEMPO | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
@@ -66,7 +66,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -215,7 +215,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.2.12" data-path="modelos-estacionarios.html"><a href="modelos-estacionarios.html#pronóstico-con-regresores-adicionales."><i class="fa fa-check"></i><b>5.2.12</b> Pronóstico con regresores adicionales.</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="modelo-prophet.html"><a href="modelo-prophet.html"><i class="fa fa-check"></i><b>6</b> MODELO PROPHET</a></li>
+<li class="chapter" data-level="6" data-path="modelo-prophet.html"><a href="modelo-prophet.html"><i class="fa fa-check"></i><b>6</b> MODELO PROPHET</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="modelo-prophet.html"><a href="modelo-prophet.html#datos"><i class="fa fa-check"></i><b>6.1</b> Datos</a></li>
+<li class="chapter" data-level="6.2" data-path="modelo-prophet.html"><a href="modelo-prophet.html#modelo-arima-1"><i class="fa fa-check"></i><b>6.2</b> Modelo ARIMA</a></li>
+<li class="chapter" data-level="6.3" data-path="modelo-prophet.html"><a href="modelo-prophet.html#evaluación-de-residuos"><i class="fa fa-check"></i><b>6.3</b> Evaluación de residuos</a></li>
+<li class="chapter" data-level="6.4" data-path="modelo-prophet.html"><a href="modelo-prophet.html#predicción"><i class="fa fa-check"></i><b>6.4</b> Predicción</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -239,15 +245,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="descripción-de-las-series-de-tiempo" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">2</span> DESCRIPCIÓN DE LAS SERIES DE TIEMPO<a href="descripción-de-las-series-de-tiempo.html#descripción-de-las-series-de-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>A continuación se presenta la base incluyendo la variable en el tiempo, la aproximación en promedios móviles, en rezagos y en estacionalidad. Todo lo anterior, a través de funciones y gráficas que permitan detectar patrones y ciclos de la variable.</p>
-<pre><code>## Rows: 529,464
+<pre><code>## Rows: 530,300
 ## Columns: 7
-## $ Fecha_Pago        &lt;date&gt; 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 2…
-## $ Pais_Origen       &lt;chr&gt; &quot;AE&quot;, &quot;AE&quot;, &quot;AT&quot;, &quot;AU&quot;, &quot;AU&quot;, &quot;BE&quot;, &quot;BE&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;CA&quot;, &quot;C…
-## $ Fecha_Origen      &lt;date&gt; 2022-12-31, 2023-01-01, 2023-01-01, 2022-12-31, 2023-01-01, 2022-12-30, 2…
-## $ Canal             &lt;chr&gt; &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;RedPropia&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;RedPropia&quot;,…
-## $ Transacciones_USD &lt;dbl&gt; 1, 3, 3, 3, 18, 1, 1, 12, 2, 35, 1, 2, 2, 17, 2, 1, 1, 1, 22, 1, 1, 2, 1, …
-## $ Monto_USD         &lt;dbl&gt; 369.33, 471.03, 1146.18, 1781.49, 13945.66, 48.23, 418.29, 2206.27, 414.72…
-## $ Monto_COP         &lt;dbl&gt; 1765896, 2252157, 5480357, 8518037, 66679489, 230602, 2000000, 10549058, 1…</code></pre>
+## $ Fecha_Pago           &lt;date&gt; 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 2023-01-01, 202…
+## $ Pais_Origen          &lt;chr&gt; &quot;AE&quot;, &quot;AE&quot;, &quot;AT&quot;, &quot;AU&quot;, &quot;AU&quot;, &quot;BE&quot;, &quot;BE&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;, &quot;BR&quot;…
+## $ Fecha_Origen         &lt;date&gt; 2022-12-31, 2023-01-01, 2023-01-01, 2022-12-31, 2023-01-01, 202…
+## $ Canal                &lt;chr&gt; &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;RedPropia&quot;, &quot;APN&quot;, &quot;APN&quot;, &quot;R…
+## $ Numero_transacciones &lt;dbl&gt; 1, 3, 3, 3, 18, 1, 1, 12, 2, 35, 1, 2, 2, 17, 2, 1, 1, 1, 22, 1,…
+## $ Monto_USD            &lt;dbl&gt; 369.33, 471.03, 1146.18, 1781.49, 13945.66, 48.23, 418.29, 2206.…
+## $ Monto_COP            &lt;dbl&gt; 1765896, 2252157, 5480357, 8518037, 66679489, 230602, 2000000, 1…</code></pre>
 <p>Como se puede observar en la tabla resumen la base de datos se compone de 7 variables:</p>
 <p>2 tipo fecha: “Fecha_pago” y “Fecha_Origen”, 3 numericas: “Número_transacciones”, “Monto_USD” y “Monto_COP” y 2 tipo texto: “Pais_Origen” y “Canal”.</p>
 <p>Con el objetivo de observar el comportamiento de las remesas en el tiempo, se realizará la descripción por las dos variables tipo fecha.</p>

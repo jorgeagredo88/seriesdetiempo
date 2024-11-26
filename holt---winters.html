@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4 HOLT - WINTERS | Series de tiempo - Remesas</title>
   <meta name="description" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
@@ -66,7 +66,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -215,7 +215,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.2.12" data-path="modelos-estacionarios.html"><a href="modelos-estacionarios.html#pronóstico-con-regresores-adicionales."><i class="fa fa-check"></i><b>5.2.12</b> Pronóstico con regresores adicionales.</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="modelo-prophet.html"><a href="modelo-prophet.html"><i class="fa fa-check"></i><b>6</b> MODELO PROPHET</a></li>
+<li class="chapter" data-level="6" data-path="modelo-prophet.html"><a href="modelo-prophet.html"><i class="fa fa-check"></i><b>6</b> MODELO PROPHET</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="modelo-prophet.html"><a href="modelo-prophet.html#datos"><i class="fa fa-check"></i><b>6.1</b> Datos</a></li>
+<li class="chapter" data-level="6.2" data-path="modelo-prophet.html"><a href="modelo-prophet.html#modelo-arima-1"><i class="fa fa-check"></i><b>6.2</b> Modelo ARIMA</a></li>
+<li class="chapter" data-level="6.3" data-path="modelo-prophet.html"><a href="modelo-prophet.html#evaluación-de-residuos"><i class="fa fa-check"></i><b>6.3</b> Evaluación de residuos</a></li>
+<li class="chapter" data-level="6.4" data-path="modelo-prophet.html"><a href="modelo-prophet.html#predicción"><i class="fa fa-check"></i><b>6.4</b> Predicción</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -259,7 +265,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## [10] 8307518.8 6546327.3 4509599.3 5737621.1 4668733.8 1329182.5 6681862.6 5926830.6 5664752.1
 ## [19] 5235327.5 5645884.9</code></pre>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-##   314473  5732341  7045531  6592872  8074062 13866707</code></pre>
+##   314473  5737621  7045531  6599192  8074062 13866707</code></pre>
 <p>La serie de tiempo <code>Datos_FP_ts</code> muestra el comportamiento de los montos de pago en dólares registrados diariamente desde enero de 2023.</p>
 <ul>
 <li><strong>Valor mínimo (Min)</strong>: El monto más bajo registrado es de <strong>314,473 USD</strong>.</li>
@@ -303,39 +309,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## End = c(2117, 5) 
 ## Frequency = 7 
 ##               fit      upr      lwr
-## 2115.714 16.11265 16.67574 15.54956
-## 2115.857 15.88687 16.45135 15.32240
-## 2116.000 14.82100 15.38687 14.25512
-## 2116.143 16.06591 16.63320 15.49862
-## 2116.286 16.14283 16.71154 15.57411
-## 2116.429 16.04821 16.61837 15.47805
-## 2116.571 16.03847 16.61008 15.46686
-## 2116.714 16.11836 16.70473 15.53200
-## 2116.857 15.89259 16.48040 15.30478
-## 2117.000 14.82671 15.41599 14.23744
-## 2117.143 16.07162 16.66238 15.48087
-## 2117.286 16.14854 16.74079 15.55629
-## 2117.429 16.05392 16.64768 15.46017
-## 2117.571 16.04418 16.63946 15.44891</code></pre>
+## 2115.714 16.11247 16.67379 15.55116
+## 2115.857 15.88674 16.44921 15.32427
+## 2116.000 14.82065 15.38429 14.25701
+## 2116.143 16.06530 16.63013 15.50048
+## 2116.286 16.14304 16.70907 15.57702
+## 2116.429 16.04815 16.61539 15.48092
+## 2116.571 16.03860 16.60707 15.47013
+## 2116.714 16.11858 16.70094 15.53623
+## 2116.857 15.89285 16.47643 15.30927
+## 2117.000 14.82676 15.41158 14.24194
+## 2117.143 16.07141 16.65749 15.48533
+## 2117.286 16.14915 16.73650 15.56181
+## 2117.429 16.05426 16.64289 15.46563
+## 2117.571 16.04471 16.63464 15.45478</code></pre>
 <p>La tabla muestra cómo el modelo de Holt-Winters estima las fluctuaciones diarias del monto en dólares en los próximos 14 días, reflejando una variabilidad ligera. Los intervalos ayudan a interpretar la predicción en función de su incertidumbre, lo que es clave para evaluar posibles escenarios en los valores futuros de los pagos.</p>
 </div>
 <div id="funcion-exponencial-para-regresar-a-la-escala-original." class="section level2 hasAnchor" number="4.9">
 <h2><span class="header-section-number">4.9</span> Funcion exponencial para regresar a la escala original.<a href="holt---winters.html#funcion-exponencial-para-regresar-a-la-escala-original." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <pre><code>##         fit      upr     lwr
-## 1   9945695 17465553 5663540
-## 2   7935638 13955019 4512667
-## 3   2733240  4813200 1552107
-## 4   9491504 16738052 5382266
-## 5  10250405 18102176 5804319
-## 6   9325010 16491689 5272706
-## 7   9234597 16355581 5213987
-## 8  10002685 17979182 5564976
-## 9   7981110 14366357 4433840
-## 10  2748902  4955400 1524895
-## 11  9545892 17233686 5287554
-## 12 10309141 18639424 5701807
-## 13  9378444 16982250 5179244
-## 14  9287513 16843192 5121232</code></pre>
+## 1   9943942 17431463 5672615
+## 2   7934584 13925219 4521122
+## 3   2732295  4800806 1555038
+## 4   9485761 16686812 5392262
+## 5  10252623 18057469 5821207
+## 6   9324489 16442722 5287816
+## 7   9235823 16306363 5231113
+## 8  10004875 17911186 5588548
+## 9   7983204 14309453 4453807
+## 10  2749038  4933619 1531778
+## 11  9543886 17149655 5311230
+## 12 10315447 18559633 5733327
+## 13  9381626 16901167 5207623
+## 14  9292417 16762181 5151419</code></pre>
 <p>Esta salida muestra las predicciones y los intervalos de confianza de un modelo de serie de tiempo para el monto en dólares. Cada fila representa un día.</p>
 <p><strong><code>fit</code></strong>: Valor predicho central en dólares. Es el valor estimado para el monto en este periodo.
 <strong><code>upr</code></strong>: Límite superior del intervalo de predicción en dólares. Representa el valor máximo esperado en ese intervalo, proporcionando un margen de incertidumbre hacia arriba.
