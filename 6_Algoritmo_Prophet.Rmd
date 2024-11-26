@@ -1,0 +1,86 @@
+# MODELO PROPHET
+
+
+Una propuesta reciente es el modelo Prophet, disponible a través del paquete fable.prophet. Este modelo fue introducido por Facebook (S. J. Taylor & Letham, 2018), originalmente para pronosticar datos diarios con estacionalidad semanal y anual, además de efectos de vacaciones. Más tarde se amplió para cubrir más tipos de datos estacionales. Funciona mejor con series temporales que tienen una fuerte estacionalidad y varias temporadas de datos históricos.
+
+
+```{r echo=FALSE, warning=FALSE}
+#install.packages("TSA")
+library(zoo)
+library(forecast)
+library(TSA)
+library(ggplot2)
+library(fpp3)
+
+#head(Datos_FP)
+```
+
+
+
+```{r echo=FALSE}
+# Instalar y cargar las librerías necesarias
+#install.packages("tidyverse")
+#install.packages("readxl")
+#install.packages("googledrive")
+
+library(readxl)
+library(googledrive)
+
+archivo_e6 <- drive_get("Tasas_cambio_nominales.xlsx")
+drive_download(archivo_e6, path = "Tasas_cambio_nominales.xlsx", overwrite = TRUE)
+TRM <- read_excel("Tasas_cambio_nominales.xlsx")
+print(TRM)
+#Datos_FP1=Datos_FP()
+
+Datos_FP1 <- Datos_FP[, !names(Datos_FP) %in% c("Dia_semana","Dia_Anio", "Mes", "Semana", "Es_Fin_de_Semana")]
+
+```
+
+
+
+```{r echo=FALSE}
+
+Datos_TRM <- Datos_FP1 %>%
+  left_join(TRM, by = c("Fecha_Pago" = "Fecha"))
+
+head(Datos_TRM)
+```
+
+
+```{r echo=FALSE}
+library(tseries)
+
+# Convertir las columnas a series temporales con frecuencia diaria
+Monto_USD_ts <- ts(Datos_TRM$Monto_USD, frequency = 365, start = c(2023, 1))
+TRM_ts <- ts(Datos_TRM$TRM, frequency = 365, start = c(2023, 1))
+```
+
+
+```{r echo=FALSE}
+# Realizar prueba de Dickey-Fuller Aumentada para verificar estacionariedad
+adf_monto <- adf.test(Monto_USD_ts, alternative = "stationary")
+adf_trm <- adf.test(TRM_ts, alternative = "stationary")
+```
+
+```{r echo=FALSE}
+# Imprimir resultados de las pruebas
+cat("Prueba ADF para Monto_USD:\n")
+print(adf_monto)
+```
+```{r echo=FALSE}
+cat("\nPrueba ADF para TRM:\n")
+print(adf_trm)
+```
+```{r echo=FALSE}
+library(ggplot2)
+#install.packages("tidyr")
+library(tidyr)
+#Datos_TRM %>%
+ # pivot_longer(c(Monto_USD, TRM),
+               #names_to = "var", values_to = "value") %>%
+  #ggplot(aes(x = Quarter, y = value)) +
+ # geom_line() +
+  #facet_grid(vars(var), scales = "free_y") +
+  #labs(title = "Monto en dolares de remesas y TRM",
+       #y = "Monto_USD % TRM")
+```

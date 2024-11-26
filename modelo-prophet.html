@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas</title>
-  <meta name="description" content="3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas" />
+  <title>6 MODELO PROPHET | Series de tiempo - Remesas</title>
+  <meta name="description" content="6 MODELO PROPHET | Series de tiempo - Remesas" />
   <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas" />
+  <meta property="og:title" content="6 MODELO PROPHET | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="3 PREPROCESAMIENTO Y VISUALIZACION | Series de tiempo - Remesas" />
+  <meta name="twitter:title" content="6 MODELO PROPHET | Series de tiempo - Remesas" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="descripción-de-las-series-de-tiempo.html"/>
-<link rel="next" href="holt---winters.html"/>
+<link rel="prev" href="modelos-estacionarios.html"/>
+
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -236,186 +236,54 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="preprocesamiento-y-visualizacion" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">3</span> PREPROCESAMIENTO Y VISUALIZACION<a href="preprocesamiento-y-visualizacion.html#preprocesamiento-y-visualizacion" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="descomposición-de-la-serie-temporal---serie-de-tiempo-por-fecha-de-pago" class="section level2 hasAnchor" number="3.1">
-<h2><span class="header-section-number">3.1</span> Descomposición de la serie temporal - Serie de tiempo por Fecha de Pago<a href="preprocesamiento-y-visualizacion.html#descomposición-de-la-serie-temporal---serie-de-tiempo-por-fecha-de-pago" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="estacionariedad" class="section level3 hasAnchor" number="3.1.1">
-<h3><span class="header-section-number">3.1.1</span> Estacionariedad<a href="preprocesamiento-y-visualizacion.html#estacionariedad" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>En el primer paso se verifica que la serie sea estacionaria a traves de la prueba Dickey-Fuller Aumentada (ADF).</p>
+<div id="modelo-prophet" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">6</span> MODELO PROPHET<a href="modelo-prophet.html#modelo-prophet" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Una propuesta reciente es el modelo Prophet, disponible a través del paquete fable.prophet. Este modelo fue introducido por Facebook (S. J. Taylor &amp; Letham, 2018), originalmente para pronosticar datos diarios con estacionalidad semanal y anual, además de efectos de vacaciones. Más tarde se amplió para cubrir más tipos de datos estacionales. Funciona mejor con series temporales que tienen una fuerte estacionalidad y varias temporadas de datos históricos.</p>
+<pre><code>## # A tibble: 649 × 2
+##    Fecha                 TRM
+##    &lt;dttm&gt;              &lt;dbl&gt;
+##  1 2023-01-01 00:00:00 4766.
+##  2 2023-01-02 00:00:00 4766.
+##  3 2023-01-03 00:00:00 4766.
+##  4 2023-01-04 00:00:00 4842.
+##  5 2023-01-05 00:00:00 4924 
+##  6 2023-01-06 00:00:00 4990.
+##  7 2023-01-07 00:00:00 4886.
+##  8 2023-01-08 00:00:00 4886.
+##  9 2023-01-09 00:00:00 4886.
+## 10 2023-01-10 00:00:00 4886.
+## # ℹ 639 more rows</code></pre>
+<pre><code>##   Fecha_Pago Monto_USD     TRM
+## 1 2023-01-01  314473.1 4765.92
+## 2 2023-01-02 4700346.1 4765.92
+## 3 2023-01-03 6069974.1 4765.92
+## 4 2023-01-04 6164948.9 4842.26
+## 5 2023-01-05 6986643.0 4924.00
+## 6 2023-01-06 6616416.0 4989.58</code></pre>
+<pre><code>## Prueba ADF para Monto_USD:</code></pre>
 <pre><code>## 
 ##  Augmented Dickey-Fuller Test
 ## 
-## data:  serie_xts
+## data:  Monto_USD_ts
 ## Dickey-Fuller = -7.4089, Lag order = 8, p-value = 0.01
 ## alternative hypothesis: stationary</code></pre>
-<p>El resultado de la prueba Dickey-Fuller Aumentada (ADF) tiene un p-valor de 0.01, lo cual indica que la serie es <strong>estacionaria</strong> por lo cual no requiere realizar una diferenciación en la serie.</p>
-<ol style="list-style-type: decimal">
-<li><p><strong>Estadístico de Dickey-Fuller = -7.4</strong>: Este es el valor calculado para el estadístico de prueba. Un valor más negativo tiende a indicar estacionariedad, ya que refuerza el rechazo de la hipótesis nula de no estacionariedad.</p></li>
-<li><p><strong>p-value = 0.01</strong>: Este p-valor es bajo (generalmente menor a 0.05 es un umbral común para significancia). Dado que el p-valor es 0.01, puedes rechazar la hipótesis nula de no estacionariedad con un 99% de confianza. Esto significa que hay una fuerte evidencia de que tu serie es estacionaria.</p></li>
-<li><p><strong>Alternative hypothesis: stationary</strong>: La hipótesis alternativa de la prueba es que la serie es estacionaria. Dado que el p-valor es bajo, este resultado respalda la hipótesis alternativa, indicando estacionariedad.</p></li>
-</ol>
-<p>En resumen, se puede concluir concluir que la serie es estacionaria con un nivel de confianza alto. Esto significa que sus propiedades estadísticas, como la media y la varianza, se mantienen constantes a lo largo del tiempo, lo cual es un buen punto de partida para aplicar modelos de series de tiempo como ARIMA, que asumen estacionariedad.</p>
-</div>
-</div>
-<div id="función-de-autocorrelación-acf-y-función-de-autocorrelación-parcial-pacf" class="section level2 hasAnchor" number="3.2">
-<h2><span class="header-section-number">3.2</span> Función de Autocorrelación (ACF) y Función de Autocorrelación Parcial (PACF)<a href="preprocesamiento-y-visualizacion.html#función-de-autocorrelación-acf-y-función-de-autocorrelación-parcial-pacf" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-24-1.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-24-2.png" width="672" /></p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-25-1.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-25-2.png" width="672" /></p>
-<p>A partir de estos gráficos podemos observar cómo los valores de la serie temporal están fuertemente correlacionados con sus propios valores, con valores altos en los rezagos 7 y 1, lo que significa que podria existir una relación directa y fuerte cada 7 días y con el día anterior, lo que podria sugerir un patón estacional semanal.</p>
-<p>Dado estas observaciones se podria considerar un modelo con un componente AR de orden 1 y una estacionalidad de 7 periodos.</p>
-</div>
-<div id="componentes-de-la-descomposición" class="section level2 hasAnchor" number="3.3">
-<h2><span class="header-section-number">3.3</span> Componentes de la Descomposición<a href="preprocesamiento-y-visualizacion.html#componentes-de-la-descomposición" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-26-1.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-26-2.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-26-3.png" width="672" /><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-26-4.png" width="672" /></p>
-<p>A partir de los gráficos anteriores se puede establecer que la serie tiene una tendencia creciente que sugiere un aumento en el valor de las remesas en dólares a lo largo del tiempo.</p>
-<p>La estacionalidad es clara y repetitiva, lo que indica un patrón cíclico que se mantiene constante en intensidad y el residuo muestra variaciones adicionales, algunas de las cuales pueden corresponder a eventos aleatorios o no modelados.</p>
-</div>
-<div id="modelo-arima" class="section level2 hasAnchor" number="3.4">
-<h2><span class="header-section-number">3.4</span> Modelo ARIMA<a href="preprocesamiento-y-visualizacion.html#modelo-arima" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>A partir de la información anterior, se contruyó un modelo ARIMA con una estacionalidad de 7 periodos.</p>
-<pre><code>## Series: serie_xtsp 
-## ARIMA(1,0,0)(2,1,0)[7] with drift 
-## 
-## Coefficients:
-##          ar1     sar1     sar2     drift
-##       0.2856  -0.6158  -0.3103  5325.258
-## s.e.  0.0381   0.0377   0.0377  6663.866
-## 
-## sigma^2 = 2.627e+12:  log likelihood = -10090.17
-## AIC=20190.34   AICc=20190.44   BIC=20212.67
-## 
-## Training set error measures:
-##                     ME    RMSE     MAE       MPE     MAPE      MASE        ACF1
-## Training set -1831.682 1607013 1084512 -8.691848 21.92267 0.7719142 -0.03913131</code></pre>
-<p><strong>Modelo ARIMA(1,0,0)(2,1,0)[7] con drift</strong></p>
-<p><strong>Coeficientes del Modelo</strong>
-Los coeficientes estimados del modelo son:</p>
-<ul>
-<li><p><strong>AR(1) = 0.2815</strong>: El coeficiente autorregresivo de primer orden indica que el valor actual de la serie está influenciado en un 28.15% por su valor anterior inmediato.</p></li>
-<li><p><strong>SAR(1)</strong> = -0.6143 y <strong>SAR(2)</strong> = -0.3077: Estos son los coeficientes de los componentes autorregresivos estacionales de primer y segundo orden, aplicados en ciclos de 7 periodos. Un valor negativo sugiere que existe una correlación inversa entre los valores actuales y los valores de hace 7 y 14 periodos, lo cual es típico de series con patrones estacionales donde los valores tienden a “compensarse” con valores de periodos anteriores.</p></li>
-<li><p><strong>Drift (Tendencia)</strong> = 5326.433: El drift indica una tendencia general en la serie hacia un crecimiento en promedio de 5326.433 unidades por periodo. La presencia de este valor significa que la serie presenta una tendencia al alza que no es capturada completamente por los componentes AR y SAR.</p></li>
-</ul>
-<p>-<strong>Errores Estándar (s.e.)</strong>: Cada coeficiente tiene un error estándar asociado, lo cual indica la precisión de la estimación. Errores estándar bajos (como los de este modelo) sugieren estimaciones confiables.</p>
-<p><strong>Medidas de Bondad de Ajuste</strong></p>
-<p>-<strong>sigma^2</strong> = 2.614e+12: Es la varianza residual del modelo, una medida de la dispersión de los residuos. Cuanto más bajo es este valor, mejor es el ajuste del modelo.</p>
-<p>-<strong>Log likelihood</strong> = -10088.61: Este es el logaritmo de la verosimilitud del modelo. Modelos con mayor (menos negativo) log-likelihood generalmente se ajustan mejor a los datos.</p>
-<ul>
-<li><strong>AIC</strong> = 20187.21, <strong>AICc</strong> = 20187.31, <strong>BIC</strong> = 20209.54:</li>
-</ul>
-<p>Estas son métricas de información que penalizan la complejidad del modelo.
-En general, valores más bajos de AIC y BIC sugieren un mejor equilibrio entre ajuste y simplicidad del modelo, en comparación con otros modelos.</p>
-<p><strong>Medidas de Error en el Conjunto de Entrenamiento</strong></p>
-<p>Estas medidas reflejan el error promedio del modelo en el conjunto de datos de entrenamiento:</p>
-<p>-<strong>ME (Mean Error)</strong> = -1837.392: Un valor cercano a 0 indica que el modelo no tiene un sesgo significativo. En este caso, el error medio es bajo y negativo, lo que sugiere un ligero sesgo hacia subestimar los valores.</p>
-<p>-<strong>RMSE (Root Mean Squared Error)</strong> = 1603135: Representa la magnitud promedio del error, penalizando más los errores grandes. Un valor más bajo indica un mejor ajuste del modelo.</p>
-<p>-<strong>MAE (Mean Absolute Error)</strong> = 1080672: La media de los errores absolutos. Este es el error promedio sin considerar el signo del error, y sugiere el error medio absoluto del modelo.</p>
-<p>-<strong>MPE (Mean Percentage Error)</strong> = -8.664%: El porcentaje de error medio muestra que el modelo, en promedio, subestima los valores en un 8.66%.</p>
-<p>-<strong>MAPE (Mean Absolute Percentage Error)</strong> = 21.84%: Este valor indica que, en promedio, el modelo tiene un error del 21.84% respecto a los valores reales. Valores de MAPE menores al 20% suelen considerarse buenos, por lo que un 21.84% indica un ajuste razonable.</p>
-<p>-<strong>MASE (Mean Absolute Scaled Error)</strong> = 0.7726: Este valor compara el MAE del modelo con el de un modelo naive (que asume que los valores actuales son iguales a los anteriores). Un valor menor a 1 indica que el modelo se desempeña mejor que el modelo naive.</p>
-<p>-<strong>ACF1</strong> = -0.03796: La autocorrelación en el primer desfase de los residuos es cercana a 0, lo cual sugiere que el modelo ha capturado bien la autocorrelación en la serie y que los residuos son, en gran medida, ruido blanco (es decir, no tienen patrones de autocorrelación significativos).</p>
-<p>En general este modelo ARIMA(1,0,0)(2,1,0)[7] con drift tiene un ajuste razonable para la serie, los residuos muestran poca autocorrelación (ACF1 cercano a 0), lo cual es un buen indicio.
-La presencia de un componente de drift (tendencia) sugiere un aumento constante en la serie, que el modelo trata de capturar.
-Las métricas de error como el RMSE, MAPE y MASE son razonablemente bajas, lo cual sugiere un ajuste decente, aunque aún podría mejorarse para reducir el MAPE.</p>
-</div>
-<div id="punto-de-cambio-de-la-serie-de-tiempo" class="section level2 hasAnchor" number="3.5">
-<h2><span class="header-section-number">3.5</span> Punto de cambio de la serie de tiempo<a href="preprocesamiento-y-visualizacion.html#punto-de-cambio-de-la-serie-de-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## Created Using changepoint version 2.2.4 
-## Changepoint type      : Change in mean 
-## Method of analysis    : AMOC 
-## Test Statistic  : Normal 
-## Type of penalty       : MBIC with value, 19.4263 
-## Minimum Segment Length : 1 
-## Maximum no. of cpts   : 1 
-## Changepoint Locations : 456</code></pre>
-<p>Segn los resultados obtenidos, se detectó <strong>un punto de cambio</strong> en la serie de tiempo.</p>
-<ol style="list-style-type: decimal">
-<li><p><strong>Changepoint type</strong>: Define el tipo de cambio detectado. En este caso, es <strong>un cambio en la media</strong> de la serie (<code>Change in mean</code>), lo que implica que la función <code>cpt.mean</code> buscó variaciones significativas en el nivel promedio de los datos.</p></li>
-<li><p><strong>Method of analysis: AMOC</strong>: El método <code>AMOC</code> (At Most One Change) implica que el análisis se ha limitado a identificar solo un posible cambio en la serie de tiempo.</p></li>
-<li><p><strong>Test Statistic: Normal</strong>: La estadística de prueba utilizada para detectar el cambio es el test de normalidad, adecuado para datos que siguen una distribución normal.</p></li>
-<li><p><strong>Type of penalty: MBIC with value, 19.4263</strong>: La penalización aplicada es la <code>MBIC</code> (Modified Bayesian Information Criterion), que ayuda a determinar la ubicación del cambio sin sobreajustar el modelo. El valor específico de esta penalización fue 19.4263, lo cual afecta el número de cambios detectados al favorecer soluciones con menos cambios.</p></li>
-<li><p><strong>Minimum Segment Length: 1</strong>: Indica que la longitud mínima de un segmento entre los puntos de cambio es 1. Es decir, el análisis considera que el cambio puede ocurrir incluso en segmentos de un solo punto.</p></li>
-<li><p><strong>Maximum no. of cpts: 1</strong>: Se limitó el número máximo de puntos de cambio a 1, lo cual es consistente con el método <code>AMOC</code> usado en el análisis.</p></li>
-<li><p><strong>Changepoint Locations: 456</strong>: El único punto de cambio detectado se encuentra en la posición 456 de la serie de tiempo. Esto significa que se encontró un cambio significativo en la media en esa posición específica de la serie.</p></li>
-</ol>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
-</div>
-<div id="predicciones-del-modelo-arima" class="section level2 hasAnchor" number="3.6">
-<h2><span class="header-section-number">3.6</span> Predicciones del Modelo ARIMA<a href="preprocesamiento-y-visualizacion.html#predicciones-del-modelo-arima" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Como parte del ejercicio se realiza la predicción de 12 días.</p>
-<pre><code>##          Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95
-## 93.71429        9184204 7107055.4 11261352 6007479.4 12360929
-## 93.85714        7598607 5438378.7  9758835 4294822.9 10902391
-## 94.00000        2700759  533892.4  4867626 -613177.5  6014695
-## 94.14286        9661864 7494456.3 11829271 6347100.2 12976627
-## 94.28571        9861905 7694453.4 12029356 6547073.9 13176736
-## 94.42857        9321229 7153773.9 11488684 6006392.5 12636065
-## 94.57143        9239938 7072483.0 11407394 5925101.4 12554775
-## 94.71429        9554357 7244521.0 11864193 6021767.8 13086946
-## 94.85714        7793031 5471963.3 10114099 4243264.2 11342798
-## 95.00000        2816478  494495.9  5138460 -734687.1  6367643
-## 95.14286        9979647 7657590.8 12301704 6428368.4 13530926
-## 95.28571       10443129 8121066.3 12765191 6891840.6 13994417</code></pre>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
-</div>
-<div id="validaciones" class="section level2 hasAnchor" number="3.7">
-<h2><span class="header-section-number">3.7</span> Validaciones<a href="preprocesamiento-y-visualizacion.html#validaciones" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="outliers" class="section level3 hasAnchor" number="3.7.1">
-<h3><span class="header-section-number">3.7.1</span> Outliers<a href="preprocesamiento-y-visualizacion.html#outliers" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
-</div>
-<div id="supuestos-de-una-arima" class="section level3 hasAnchor" number="3.7.2">
-<h3><span class="header-section-number">3.7.2</span> Supuestos de una ARIMA<a href="preprocesamiento-y-visualizacion.html#supuestos-de-una-arima" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="media-cero-de-los-residuos" class="section level4 hasAnchor" number="3.7.2.1">
-<h4><span class="header-section-number">3.7.2.1</span> Media cero de los residuos<a href="preprocesamiento-y-visualizacion.html#media-cero-de-los-residuos" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <pre><code>## 
-##  One Sample t-test
-## 
-## data:  residuals(modelo_arima)
-## t = -0.029015, df = 648, p-value = 0.9769
-## alternative hypothesis: true mean is not equal to 0
-## 95 percent confidence interval:
-##  -125794.6  122131.2
-## sample estimates:
-## mean of x 
-## -1831.682</code></pre>
-<p>Con este resultado se puede decir que no hay evidencia suficiente para rechazar la hipótesis nula de que la media de los residuos es 0.</p>
-</div>
-<div id="independencia-de-los-residuos" class="section level4 hasAnchor" number="3.7.2.2">
-<h4><span class="header-section-number">3.7.2.2</span> Independencia de los residuos<a href="preprocesamiento-y-visualizacion.html#independencia-de-los-residuos" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+## Prueba ADF para TRM:</code></pre>
 <pre><code>## 
-##  Box-Ljung test
+##  Augmented Dickey-Fuller Test
 ## 
-## data:  residuals(modelo_arima)
-## X-squared = 24.483, df = 7, p-value = 0.0009367</code></pre>
-<p>La prueba de Ljung-Box evalúa si los residuos del modelo ARIMA están autocorrelacionados. Esto es importante porque, idealmente, los residuos deberían comportarse como ruido blanco para indicar que el modelo ha capturado adecuadamente la estructura de la serie de tiempo.</p>
-<p>El p-valor es menor que 0.05, lo que sugiere que hay suficiente evidencia para rechazar la hipótesis nula de independencia de los residuos, indicando que los residuos del modelo aún presentan autocorrelación significativa en al menos uno de los primeros 7 rezagos.</p>
-<p>El test de Ljung-Box sugiere que aún queda información estructural en los residuos que el modelo no ha capturado.</p>
-</div>
-<div id="normalidad-de-los-residuos" class="section level4 hasAnchor" number="3.7.2.3">
-<h4><span class="header-section-number">3.7.2.3</span> Normalidad de los residuos<a href="preprocesamiento-y-visualizacion.html#normalidad-de-los-residuos" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<pre><code>## 
-##  Shapiro-Wilk normality test
-## 
-## data:  residuals(modelo_arima)
-## W = 0.93444, p-value = 2.848e-16</code></pre>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
-<p><strong>Gráfico Q-Q (Quantile-Quantile)</strong></p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
-<p>Un valor p menor que 0.05 indica que se rechaza la hipótesis nula de normalidad, por lo que los residuos no siguen una distribución normal.</p>
-<p>Se debe buscar cual es la distribución de ajuste,se podría intentar una distribución t ya que es la más parecida visualmente tiene colas más pesadas que la normal, lo cual puede capturar mejor los valores extremos.</p>
+## data:  TRM_ts
+## Dickey-Fuller = -1.6842, Lag order = 8, p-value = 0.712
+## alternative hypothesis: stationary</code></pre>
 
-</div>
-</div>
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="descripción-de-las-series-de-tiempo.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="holt---winters.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="modelos-estacionarios.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -446,7 +314,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/USERNAME/REPO/edit/BRANCH/3_Preprocesamiento.Rmd",
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/6_Algoritmo_Prophet.Rmd",
 "text": "Edit"
 },
 "history": {

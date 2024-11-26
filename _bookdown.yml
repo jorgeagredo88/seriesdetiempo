@@ -6,5 +6,6 @@ rmd_files:
   - 3_Preprocesamiento.Rmd # El tercer archivo que quieres combinar
   - 4_Holter-Winter.Rmd # El cuarto archivo que quieres combinar
   - 5_Modelos_estacionarios.Rmd # El quinto archivo que quieres combinar
+  - 6_Algoritmo_Prophet.Rmd # El sexto archivo que quieres combinar
 output_dir: "." 
 delete_merged_file: true
