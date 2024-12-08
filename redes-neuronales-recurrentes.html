@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>4 HOLT - WINTERS | Series de tiempo - Remesas</title>
-  <meta name="description" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
+  <title>7 REDES NEURONALES RECURRENTES | Series de tiempo - Remesas</title>
+  <meta name="description" content="7 REDES NEURONALES RECURRENTES | Series de tiempo - Remesas" />
   <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
+  <meta property="og:title" content="7 REDES NEURONALES RECURRENTES | Series de tiempo - Remesas" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="4 HOLT - WINTERS | Series de tiempo - Remesas" />
+  <meta name="twitter:title" content="7 REDES NEURONALES RECURRENTES | Series de tiempo - Remesas" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="preprocesamiento-y-visualizacion.html"/>
-<link rel="next" href="modelos-estacionarios.html"/>
+<link rel="prev" href="modelo-prophet.html"/>
+
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -257,8 +257,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="holt---winters" class="section level1 hasAnchor" number="4">
-<h1><span class="header-section-number">4</span> HOLT - WINTERS<a href="holt---winters.html#holt---winters" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="redes-neuronales-recurrentes" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">7</span> REDES NEURONALES RECURRENTES<a href="redes-neuronales-recurrentes.html#redes-neuronales-recurrentes" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="elman" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Elman<a href="redes-neuronales-recurrentes.html#elman" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Comenzamos con la serie original de monto de remesas en dólares por fecha de pago.</p>
 <pre><code>##   Fecha_Pago Monto_USD
 ## 1 2023-01-01  314473.1
 ## 2 2023-01-02 4700346.1
@@ -266,103 +269,199 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4 2023-01-04 6164948.9
 ## 5 2023-01-05 6986643.0
 ## 6 2023-01-06 6616416.0</code></pre>
-<div id="visualizacion-de-la-variación-de-los-pagos-a-lo-largo-del-tiempo" class="section level2 hasAnchor" number="4.1">
-<h2><span class="header-section-number">4.1</span> Visualizacion de la variación de los pagos a lo largo del tiempo<a href="holt---winters.html#visualizacion-de-la-variación-de-los-pagos-a-lo-largo-del-tiempo" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p>En el paso siguiente se realiza el escalamiento de la variable monto.</p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<p>A continuación se realiza la construcción de las variables rezagadas del modelo.</p>
+<pre><code>##            [,1]       [,2]         [,3]         [,4]         [,5]         [,6]         [,7]
+## [1,] -2.0618141 -0.4755927  0.006788581  0.152709533 -0.171152263 -0.208585545 -0.748409491
+## [2,] -1.7146299 -2.0618141 -0.475592677  0.006788581  0.152709533 -0.171152263 -0.208585545
+## [3,]  0.6733183 -1.7146299 -2.061814051 -0.475592677  0.006788581  0.152709533 -0.171152263
+## [4,] -0.0208361  0.6733183 -1.714629889 -2.061814051 -0.475592677  0.006788581  0.152709533
+## [5,] -0.8235903 -0.0208361  0.673318316 -1.714629889 -2.061814051 -0.475592677  0.006788581
+## [6,] -0.3395789 -0.8235903 -0.020836104  0.673318316 -1.714629889 -2.061814051 -0.475592677
+##              [,8]
+## [1,] -2.477053505
+## [2,] -0.748409491
+## [3,] -0.208585545
+## [4,] -0.171152263
+## [5,]  0.152709533
+## [6,]  0.006788581</code></pre>
+<p>El primer vector es el dependiente (output) mientras que los otros 7 serán las varaibles independientes (inputs) y a partir de estos set de datos se construyen los dataset de entrenamiento y prueba.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="redes-neuronales-recurrentes.html#cb46-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb46-2"><a href="redes-neuronales-recurrentes.html#cb46-2" tabindex="-1"></a>train_size <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(inputs))</span>
+<span id="cb46-3"><a href="redes-neuronales-recurrentes.html#cb46-3" tabindex="-1"></a>train_inputs <span class="ot">&lt;-</span> inputs[<span class="dv">1</span><span class="sc">:</span>train_size, ]</span>
+<span id="cb46-4"><a href="redes-neuronales-recurrentes.html#cb46-4" tabindex="-1"></a>train_outputs <span class="ot">&lt;-</span> outputs[<span class="dv">1</span><span class="sc">:</span>train_size]</span>
+<span id="cb46-5"><a href="redes-neuronales-recurrentes.html#cb46-5" tabindex="-1"></a>test_inputs <span class="ot">&lt;-</span> inputs[(train_size <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(inputs), ]</span>
+<span id="cb46-6"><a href="redes-neuronales-recurrentes.html#cb46-6" tabindex="-1"></a>test_outputs <span class="ot">&lt;-</span> outputs[(train_size <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(outputs)]</span></code></pre></div>
+<p>A partir de esto y de pruebas se estimo el modelo con los siguientes parametros:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="redes-neuronales-recurrentes.html#cb47-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb47-2"><a href="redes-neuronales-recurrentes.html#cb47-2" tabindex="-1"></a>elman_net <span class="ot">&lt;-</span> <span class="fu">elman</span>(train_inputs, train_outputs,</span>
+<span id="cb47-3"><a href="redes-neuronales-recurrentes.html#cb47-3" tabindex="-1"></a>                   <span class="at">size =</span> <span class="fu">c</span>(<span class="dv">5</span>),                </span>
+<span id="cb47-4"><a href="redes-neuronales-recurrentes.html#cb47-4" tabindex="-1"></a>                   <span class="at">learnFuncParams =</span> <span class="fu">c</span>(<span class="fl">0.1</span>),    </span>
+<span id="cb47-5"><a href="redes-neuronales-recurrentes.html#cb47-5" tabindex="-1"></a>                   <span class="at">maxit =</span> <span class="dv">10000</span>,                </span>
+<span id="cb47-6"><a href="redes-neuronales-recurrentes.html#cb47-6" tabindex="-1"></a>                   <span class="at">linOut =</span> <span class="cn">TRUE</span>)              </span>
+<span id="cb47-7"><a href="redes-neuronales-recurrentes.html#cb47-7" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="redes-neuronales-recurrentes.html#cb47-8" tabindex="-1"></a><span class="fu">print</span>(elman_net)</span></code></pre></div>
+<pre><code>## Class: elman-&gt;rsnns
+## Number of inputs: 7 
+## Number of outputs: 1 
+## Maximal iterations: 10000 
+## Initialization function: JE_Weights 
+## Initialization function parameters: 1 -1 0.3 1 0.5 
+## Learning function: JE_BP 
+## Learning function parameters: 0.1 
+## Update function:JE_Order
+## Update function parameters: 0 
+## Patterns are shuffled internally: FALSE 
+## Compute error in every iteration: TRUE 
+## Architecture Parameters:
+## $size
+## [1] 5
+## 
+## All members of model:
+##  [1] &quot;nInputs&quot;               &quot;maxit&quot;                 &quot;initFunc&quot;             
+##  [4] &quot;initFuncParams&quot;        &quot;learnFunc&quot;             &quot;learnFuncParams&quot;      
+##  [7] &quot;updateFunc&quot;            &quot;updateFuncParams&quot;      &quot;shufflePatterns&quot;      
+## [10] &quot;computeIterativeError&quot; &quot;snnsObject&quot;            &quot;archParams&quot;           
+## [13] &quot;IterativeFitError&quot;     &quot;fitted.values&quot;         &quot;nOutputs&quot;</code></pre>
+<div id="interacciones" class="section level3 hasAnchor" number="7.1.1">
+<h3><span class="header-section-number">7.1.1</span> Interacciones<a href="redes-neuronales-recurrentes.html#interacciones" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="redes-neuronales-recurrentes.html#cb49-1" tabindex="-1"></a><span class="fu">plotIterativeError</span>(elman_net)</span></code></pre></div>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-81-1.png" width="672" />
+### size</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="redes-neuronales-recurrentes.html#cb50-1" tabindex="-1"></a>size_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>)</span>
+<span id="cb50-2"><a href="redes-neuronales-recurrentes.html#cb50-2" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb50-3"><a href="redes-neuronales-recurrentes.html#cb50-3" tabindex="-1"></a></span>
+<span id="cb50-4"><a href="redes-neuronales-recurrentes.html#cb50-4" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> size_values) {</span>
+<span id="cb50-5"><a href="redes-neuronales-recurrentes.html#cb50-5" tabindex="-1"></a>  elman_net <span class="ot">&lt;-</span> <span class="fu">elman</span>(train_inputs, train_outputs,</span>
+<span id="cb50-6"><a href="redes-neuronales-recurrentes.html#cb50-6" tabindex="-1"></a>                     <span class="at">size =</span> <span class="fu">c</span>(s),</span>
+<span id="cb50-7"><a href="redes-neuronales-recurrentes.html#cb50-7" tabindex="-1"></a>                     <span class="at">learnFuncParams =</span> <span class="fu">c</span>(<span class="fl">0.1</span>),</span>
+<span id="cb50-8"><a href="redes-neuronales-recurrentes.html#cb50-8" tabindex="-1"></a>                     <span class="at">maxit =</span> <span class="dv">10000</span>,</span>
+<span id="cb50-9"><a href="redes-neuronales-recurrentes.html#cb50-9" tabindex="-1"></a>                     <span class="at">linOut =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb50-10"><a href="redes-neuronales-recurrentes.html#cb50-10" tabindex="-1"></a>  pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(elman_net, test_inputs)</span>
+<span id="cb50-11"><a href="redes-neuronales-recurrentes.html#cb50-11" tabindex="-1"></a>  mse <span class="ot">&lt;-</span> <span class="fu">mean</span>((test_outputs <span class="sc">-</span> pred)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb50-12"><a href="redes-neuronales-recurrentes.html#cb50-12" tabindex="-1"></a>  </span>
+<span id="cb50-13"><a href="redes-neuronales-recurrentes.html#cb50-13" tabindex="-1"></a>  results[[<span class="fu">as.character</span>(s)]] <span class="ot">&lt;-</span> mse</span>
+<span id="cb50-14"><a href="redes-neuronales-recurrentes.html#cb50-14" tabindex="-1"></a>}</span>
+<span id="cb50-15"><a href="redes-neuronales-recurrentes.html#cb50-15" tabindex="-1"></a></span>
+<span id="cb50-16"><a href="redes-neuronales-recurrentes.html#cb50-16" tabindex="-1"></a>optimal_size <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(<span class="fu">which.min</span>(<span class="fu">unlist</span>(results))))</span>
+<span id="cb50-17"><a href="redes-neuronales-recurrentes.html#cb50-17" tabindex="-1"></a><span class="fu">print</span>(optimal_size)</span></code></pre></div>
+<pre><code>## [1] 5</code></pre>
 </div>
-<div id="definición-y-caracteristicas-de-la-serie." class="section level2 hasAnchor" number="4.2">
-<h2><span class="header-section-number">4.2</span> Definición y caracteristicas de la serie.<a href="holt---winters.html#definición-y-caracteristicas-de-la-serie." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## Time Series:
-## Start = c(2023, 1) 
-## End = c(2023, 20) 
-## Frequency = 365 
-##  [1]  314473.1 4700346.1 6069974.1 6164948.9 6986643.0 6616416.0 5392530.2 1368008.4 2248875.5
-## [10] 8307518.8 6546327.3 4509599.3 5737621.1 4668733.8 1329182.5 6681862.6 5926830.6 5664752.1
-## [19] 5235327.5 5645884.9</code></pre>
-<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-##   314473  5737621  7045531  6599192  8074062 13866707</code></pre>
-<p>La serie de tiempo <code>Datos_FP_ts</code> muestra el comportamiento de los montos de pago en dólares registrados diariamente desde enero de 2023.</p>
-<ul>
-<li><strong>Valor mínimo (Min)</strong>: El monto más bajo registrado es de <strong>314,473 USD</strong>.</li>
-<li><strong>Primer cuartil (1st Qu.)</strong>: El 25% de los montos registrados son menores o iguales a <strong>5,732,341 USD</strong>.</li>
-<li><strong>Mediana (Median)</strong>: El valor central de la serie es <strong>7,045,531 USD</strong>, lo que indica que la mitad de los montos son mayores o iguales a este valor y la otra mitad son menores.</li>
-<li><strong>Media (Mean)</strong>: El promedio de los montos es de <strong>6,592,872 USD</strong>, lo cual está relativamente cerca de la mediana, sugiriendo que no hay una gran asimetría en los datos.</li>
-<li><strong>Tercer cuartil (3rd Qu.)</strong>: El 75% de los montos son menores o iguales a <strong>8,074,062 USD</strong>.</li>
-<li><strong>Valor máximo (Max)</strong>: El monto máximo registrado es de <strong>13,866,707 USD</strong>.</li>
-</ul>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<div id="aprendizaje" class="section level3 hasAnchor" number="7.1.2">
+<h3><span class="header-section-number">7.1.2</span> Aprendizaje<a href="redes-neuronales-recurrentes.html#aprendizaje" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="redes-neuronales-recurrentes.html#cb52-1" tabindex="-1"></a>learning_rates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.5</span>)</span>
+<span id="cb52-2"><a href="redes-neuronales-recurrentes.html#cb52-2" tabindex="-1"></a>results_lr <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb52-3"><a href="redes-neuronales-recurrentes.html#cb52-3" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="redes-neuronales-recurrentes.html#cb52-4" tabindex="-1"></a><span class="cf">for</span> (lr <span class="cf">in</span> learning_rates) {</span>
+<span id="cb52-5"><a href="redes-neuronales-recurrentes.html#cb52-5" tabindex="-1"></a>  </span>
+<span id="cb52-6"><a href="redes-neuronales-recurrentes.html#cb52-6" tabindex="-1"></a>  elman_net <span class="ot">&lt;-</span> <span class="fu">elman</span>(train_inputs, train_outputs,</span>
+<span id="cb52-7"><a href="redes-neuronales-recurrentes.html#cb52-7" tabindex="-1"></a>                     <span class="at">size =</span> <span class="fu">c</span>(<span class="dv">5</span>),  <span class="co"># Usamos el tamaño óptimo encontrado antes</span></span>
+<span id="cb52-8"><a href="redes-neuronales-recurrentes.html#cb52-8" tabindex="-1"></a>                     <span class="at">learnFuncParams =</span> <span class="fu">c</span>(lr),</span>
+<span id="cb52-9"><a href="redes-neuronales-recurrentes.html#cb52-9" tabindex="-1"></a>                     <span class="at">maxit =</span> <span class="dv">10000</span>,</span>
+<span id="cb52-10"><a href="redes-neuronales-recurrentes.html#cb52-10" tabindex="-1"></a>                     <span class="at">linOut =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb52-11"><a href="redes-neuronales-recurrentes.html#cb52-11" tabindex="-1"></a>    pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(elman_net, test_inputs)</span>
+<span id="cb52-12"><a href="redes-neuronales-recurrentes.html#cb52-12" tabindex="-1"></a>  mse <span class="ot">&lt;-</span> <span class="fu">mean</span>((test_outputs <span class="sc">-</span> pred)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb52-13"><a href="redes-neuronales-recurrentes.html#cb52-13" tabindex="-1"></a>  </span>
+<span id="cb52-14"><a href="redes-neuronales-recurrentes.html#cb52-14" tabindex="-1"></a>  results_lr[[<span class="fu">as.character</span>(lr)]] <span class="ot">&lt;-</span> mse</span>
+<span id="cb52-15"><a href="redes-neuronales-recurrentes.html#cb52-15" tabindex="-1"></a>}</span>
+<span id="cb52-16"><a href="redes-neuronales-recurrentes.html#cb52-16" tabindex="-1"></a></span>
+<span id="cb52-17"><a href="redes-neuronales-recurrentes.html#cb52-17" tabindex="-1"></a>optimal_lr <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(<span class="fu">which.min</span>(<span class="fu">unlist</span>(results_lr))))</span>
+<span id="cb52-18"><a href="redes-neuronales-recurrentes.html#cb52-18" tabindex="-1"></a><span class="fu">print</span>(optimal_lr)</span></code></pre></div>
+<pre><code>## [1] 0.01</code></pre>
 </div>
-<div id="gráfico-de-caja-boxplot-por-día-de-la-semana" class="section level2 hasAnchor" number="4.3">
-<h2><span class="header-section-number">4.3</span> Gráfico de Caja (Boxplot) por Día de la Semana<a href="holt---winters.html#gráfico-de-caja-boxplot-por-día-de-la-semana" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
-<p>El gráfico de cajas muestra la distribución de los montos en dólares (Monto_USD) para cada día de la semana (Dia_semana). El es comparar los montos de pago en función del día de la semana para identificar variaciones, como si ciertos días tienden a tener pagos más altos o más bajos.</p>
-<p>En este caso, es notable que el dia domingo se registran valores mas bajos en comparación con los demas dias de la semana.</p>
+<div id="predicciones" class="section level3 hasAnchor" number="7.1.3">
+<h3><span class="header-section-number">7.1.3</span> Predicciones<a href="redes-neuronales-recurrentes.html#predicciones" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>## Error cuadrático medio (MSE): 3.319782e+12</code></pre>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-85-1.png" width="672" /></p>
 </div>
-<div id="logaritmo-de-monto-en-dolares" class="section level2 hasAnchor" number="4.4">
-<h2><span class="header-section-number">4.4</span> Logaritmo de Monto en Dolares<a href="holt---winters.html#logaritmo-de-monto-en-dolares" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>El siguiente grafico permite visualizar la evolución de los pagos en el tiempo, facilitando la observación de cambios y patrones en la serie al suavizar la variabilidad de los datos.</p>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
 </div>
-<div id="aplicacion-del-modelo-holt-winter" class="section level2 hasAnchor" number="4.5">
-<h2><span class="header-section-number">4.5</span> Aplicacion del modelo Holt-Winter<a href="holt---winters.html#aplicacion-del-modelo-holt-winter" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>A continuación se utiliza una serie de tiempo transformada a escala logarítmica para aplicar el modelo de Holt-Winters para ajustar y descomponer la serie.</p>
-<p>Se aplica el modelo de Holt-Winters con un componente estacional aditivo (seasonal = “additive”) a la serie Datos_FP_ts2. El modelo de Holt-Winters es un método de suavizamiento exponencial que se utiliza para ajustar y pronosticar series de tiempo con componentes estacionales, tendencia y aleatoriedad.</p>
-<p><strong>Estacionalidad aditiva:</strong> Se asume que los efectos estacionales son constantes y no dependen del nivel de la serie.</p>
+<div id="jordan" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Jordan<a href="redes-neuronales-recurrentes.html#jordan" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Partimos del dataset escalado con rezagos utilizado en el modelo anterior.</p>
+<pre><code>## SNNS network definition file V1.4-3D
+## generated at Sun Dec  8 02:27:11 2024
+## 
+## network name : RSNNS_untitled
+## source files :
+## no. of units : 14
+## no. of connections : 47
+## no. of unit types : 0
+## no. of site types : 0
+## 
+## 
+## learning function : JE_BP
+## update function   : JE_Order
+## 
+## 
+## unit default section :
+## 
+## act      | bias     | st | subnet | layer | act func     | out func
+## ---------|----------|----|--------|-------|--------------|-------------
+##  1.00000 |  0.00000 | i  |      0 |     1 | Act_Logistic | Out_Identity 
+## ---------|----------|----|--------|-------|--------------|-------------
+## 
+## 
+## unit definition section :
+## 
+## no. | typeName | unitName | act      | bias     | st | position | act func     | out func | sites
+## ----|----------|----------|----------|----------|----|----------|--------------|----------|-------
+##   1 |          | inp1     |  0.35742 | -0.42607 | i  |  1, 1, 0 | Act_Identity |          | 
+##   2 |          | inp2     |  0.56327 |  0.82986 | i  |  1, 2, 0 | Act_Identity |          | 
+##   3 |          | inp3     | -1.75536 |  0.07760 | i  |  1, 3, 0 | Act_Identity |          | 
+##   4 |          | inp4     |  0.22258 | -0.87181 | i  |  1, 4, 0 | Act_Identity |          | 
+##   5 |          | inp5     |  0.24407 | -0.69059 | i  |  1, 5, 0 | Act_Identity |          | 
+##   6 |          | inp6     |  0.16266 | -0.43237 | i  |  1, 6, 0 | Act_Identity |          | 
+##   7 |          | inp7     | -0.00011 |  0.75239 | i  |  1, 7, 0 | Act_Identity |          | 
+##   8 |          | hid1     |  0.79890 |  1.82552 | h  |  7, 1, 0 |||
+##   9 |          | hid2     |  0.00000 | -17.72354 | h  |  7, 2, 0 |||
+##  10 |          | hid3     |  1.00000 |  2.25318 | h  |  7, 3, 0 |||
+##  11 |          | hid4     |  0.00000 | -6.00610 | h  |  7, 4, 0 |||
+##  12 |          | hid5     |  1.00000 | 18.46435 | h  |  7, 5, 0 |||
+##  13 |          | out1     |  0.24099 | 246.66528 | o  | 12, 1, 0 | Act_Identity |          | 
+##  14 |          | con1     |  0.38671 |  0.50000 | sh  |  4, 8, 0 | Act_Identity |          | 
+## ----|----------|----------|----------|----------|----|----------|--------------|----------|-------
+## 
+## 
+## connection definition section :
+## 
+## target | site | source:weight
+## -------|------|---------------------------------------------------------------------------------------------------------------------
+##      8 |      | 14: 1.05015,  7:-0.01873,  6: 1.17112,  5: 0.58670,  4: 0.48567,  3:-0.03259,  2:-0.11735,  1:-3.88643
+##      9 |      | 14: 6.50720,  7:-2.34107,  6:-0.03078,  5:-10.27127,  4: 8.34615,  3:-2.75230,  2: 0.23806,  1:-14.06884
+##     10 |      | 14: 4.47030,  7:-3.65810,  6: 0.33105,  5: 3.83519,  4:-2.03390,  3:-5.66022,  2:-3.62368,  1: 4.67102
+##     11 |      | 14: 0.73325,  7: 8.26014,  6:-7.31731,  5: 1.12134,  4:-2.43978,  3: 5.62108,  2: 2.18211,  1:-4.11249
+##     12 |      | 14:-0.43379,  7:12.47942,  6:-0.30661,  5:-5.33998,  4:-4.00576,  3: 0.33927,  2:-5.04606,  1: 1.02413
+##     13 |      | 12: 1.94272, 11:-0.71857, 10:-0.98333,  9:-1.01799,  8:-0.89923
+##     14 |      | 14: 0.30000, 13: 1.00000
+## -------|------|---------------------------------------------------------------------------------------------------------------------</code></pre>
+<div id="interacciones-1" class="section level3 hasAnchor" number="7.2.1">
+<h3><span class="header-section-number">7.2.1</span> Interacciones<a href="redes-neuronales-recurrentes.html#interacciones-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-87-1.png" width="672" /></p>
 </div>
-<div id="gráfico-del-ajuste-del-modelo-de-holt-winters" class="section level2 hasAnchor" number="4.6">
-<h2><span class="header-section-number">4.6</span> Gráfico del Ajuste del Modelo de Holt-Winters<a href="holt---winters.html#gráfico-del-ajuste-del-modelo-de-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<div id="size-y-aprendizaje" class="section level3 hasAnchor" number="7.2.2">
+<h3><span class="header-section-number">7.2.2</span> size y aprendizaje<a href="redes-neuronales-recurrentes.html#size-y-aprendizaje" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>##   size learn_rate        mse
+## 1    5       0.01  1.9442376
+## 2    5       0.10  0.3168776
+## 3    5       0.20  0.3192395
+## 4   10       0.01  3.9470601
+## 5   10       0.10  1.2774579
+## 6   10       0.20  0.2684727
+## 7   15       0.01  4.7967486
+## 8   15       0.10 16.4472776
+## 9   15       0.20  1.1015140</code></pre>
+<pre><code>## Mejores parámetros:</code></pre>
+<pre><code>##   size learn_rate       mse
+## 6   10        0.2 0.2684727</code></pre>
 </div>
-<div id="gráfico-de-la-descomposición-de-holt-winters" class="section level2 hasAnchor" number="4.7">
-<h2><span class="header-section-number">4.7</span> Gráfico de la Descomposición de Holt-Winters<a href="holt---winters.html#gráfico-de-la-descomposición-de-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
-</div>
-<div id="predicciones-a-partir-del-modelo-de-holt-winters" class="section level2 hasAnchor" number="4.8">
-<h2><span class="header-section-number">4.8</span> Predicciones a partir del modelo de Holt-Winters<a href="holt---winters.html#predicciones-a-partir-del-modelo-de-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## Time Series:
-## Start = c(2115, 6) 
-## End = c(2117, 5) 
-## Frequency = 7 
-##               fit      upr      lwr
-## 2115.714 16.11247 16.67379 15.55116
-## 2115.857 15.88674 16.44921 15.32427
-## 2116.000 14.82065 15.38429 14.25701
-## 2116.143 16.06530 16.63013 15.50048
-## 2116.286 16.14304 16.70907 15.57702
-## 2116.429 16.04815 16.61539 15.48092
-## 2116.571 16.03860 16.60707 15.47013
-## 2116.714 16.11858 16.70094 15.53623
-## 2116.857 15.89285 16.47643 15.30927
-## 2117.000 14.82676 15.41158 14.24194
-## 2117.143 16.07141 16.65749 15.48533
-## 2117.286 16.14915 16.73650 15.56181
-## 2117.429 16.05426 16.64289 15.46563
-## 2117.571 16.04471 16.63464 15.45478</code></pre>
-<p>La tabla muestra cómo el modelo de Holt-Winters estima las fluctuaciones diarias del monto en dólares en los próximos 14 días, reflejando una variabilidad ligera. Los intervalos ayudan a interpretar la predicción en función de su incertidumbre, lo que es clave para evaluar posibles escenarios en los valores futuros de los pagos.</p>
-</div>
-<div id="funcion-exponencial-para-regresar-a-la-escala-original." class="section level2 hasAnchor" number="4.9">
-<h2><span class="header-section-number">4.9</span> Funcion exponencial para regresar a la escala original.<a href="holt---winters.html#funcion-exponencial-para-regresar-a-la-escala-original." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>##         fit      upr     lwr
-## 1   9943942 17431463 5672615
-## 2   7934584 13925219 4521122
-## 3   2732295  4800806 1555038
-## 4   9485761 16686812 5392262
-## 5  10252623 18057469 5821207
-## 6   9324489 16442722 5287816
-## 7   9235823 16306363 5231113
-## 8  10004875 17911186 5588548
-## 9   7983204 14309453 4453807
-## 10  2749038  4933619 1531778
-## 11  9543886 17149655 5311230
-## 12 10315447 18559633 5733327
-## 13  9381626 16901167 5207623
-## 14  9292417 16762181 5151419</code></pre>
-<p>Esta salida muestra las predicciones y los intervalos de confianza de un modelo de serie de tiempo para el monto en dólares. Cada fila representa un día.</p>
-<p><strong><code>fit</code></strong>: Valor predicho central en dólares. Es el valor estimado para el monto en este periodo.
-<strong><code>upr</code></strong>: Límite superior del intervalo de predicción en dólares. Representa el valor máximo esperado en ese intervalo, proporcionando un margen de incertidumbre hacia arriba.
-<strong><code>lwr</code></strong>: Límite inferior del intervalo de predicción en dólares. Indica el valor mínimo esperado, estableciendo el margen de incertidumbre hacia abajo.</p>
-<p>Este intervalo entre <code>upr</code> y <code>lwr</code> ayuda a entender la variabilidad y la confiabilidad de la predicción en cada periodo.</p>
+<div id="predicciones-1" class="section level3 hasAnchor" number="7.2.3">
+<h3><span class="header-section-number">7.2.3</span> Predicciones<a href="redes-neuronales-recurrentes.html#predicciones-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>## Error cuadrático medio (MSE): 3.319782e+12</code></pre>
+<p><img src="Remesas-en-dolares_files/figure-html/unnamed-chunk-90-1.png" width="672" /></p>
 
+</div>
 </div>
 </div>
             </section>
@@ -370,8 +469,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="preprocesamiento-y-visualizacion.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="modelos-estacionarios.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="modelo-prophet.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -402,7 +501,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/USERNAME/REPO/edit/BRANCH/4_Holter-Winter.Rmd",
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/7_Redes_Neuronales_Recurrentes.Rmd",
 "text": "Edit"
 },
 "history": {

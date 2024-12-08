@@ -23,7 +23,7 @@
 <meta name="author" content="Analisis de Series de Tiempo Grupo 5 - William Contreras, Camilo Espinoza, Jorge Agredo" />
 
 
-<meta name="date" content="2024-11-25" />
+<meta name="date" content="2024-12-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -222,6 +222,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.3" data-path="modelo-prophet.html"><a href="modelo-prophet.html#evaluación-de-residuos"><i class="fa fa-check"></i><b>6.3</b> Evaluación de residuos</a></li>
 <li class="chapter" data-level="6.4" data-path="modelo-prophet.html"><a href="modelo-prophet.html#predicción"><i class="fa fa-check"></i><b>6.4</b> Predicción</a></li>
 </ul></li>
+<li class="chapter" data-level="7" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html"><i class="fa fa-check"></i><b>7</b> REDES NEURONALES RECURRENTES</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#elman"><i class="fa fa-check"></i><b>7.1</b> Elman</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#interacciones"><i class="fa fa-check"></i><b>7.1.1</b> Interacciones</a></li>
+<li class="chapter" data-level="7.1.2" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#aprendizaje"><i class="fa fa-check"></i><b>7.1.2</b> Aprendizaje</a></li>
+<li class="chapter" data-level="7.1.3" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#predicciones"><i class="fa fa-check"></i><b>7.1.3</b> Predicciones</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#jordan"><i class="fa fa-check"></i><b>7.2</b> Jordan</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#interacciones-1"><i class="fa fa-check"></i><b>7.2.1</b> Interacciones</a></li>
+<li class="chapter" data-level="7.2.2" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#size-y-aprendizaje"><i class="fa fa-check"></i><b>7.2.2</b> size y aprendizaje</a></li>
+<li class="chapter" data-level="7.2.3" data-path="redes-neuronales-recurrentes.html"><a href="redes-neuronales-recurrentes.html#predicciones-1"><i class="fa fa-check"></i><b>7.2.3</b> Predicciones</a></li>
+</ul></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -244,13 +259,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="modelos-estacionarios" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">5</span> MODELOS ESTACIONARIOS<a href="modelos-estacionarios.html#modelos-estacionarios" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<pre><code>##   Fecha_Pago Monto_USD Dia_semana
-## 1 2023-01-01  314473.1        dom
-## 2 2023-01-02 4700346.1        lun
-## 3 2023-01-03 6069974.1        mar
-## 4 2023-01-04 6164948.9        mié
-## 5 2023-01-05 6986643.0        jue
-## 6 2023-01-06 6616416.0        vie</code></pre>
+<pre><code>##   Fecha_Origen Monto_USD
+## 1   2018-11-20    658.18
+## 2   2019-02-04    253.15
+## 3   2019-05-22    405.03
+## 4   2019-08-10    250.02
+## 5   2019-12-13    598.19
+## 6   2020-02-24     20.70</code></pre>
 <div id="metodología-box-jenkins" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> METODOLOGÍA BOX-JENKINS<a href="modelos-estacionarios.html#metodología-box-jenkins" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="visualizacion-de-la-serie" class="section level3 hasAnchor" number="5.1.1">

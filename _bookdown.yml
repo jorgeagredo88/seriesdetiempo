@@ -1,11 +1,12 @@
 book_filename: "Remesas en dolares" 
 rmd_files:
-  - index.Rmd    # Introducción o primer capítulo
-  - 1_Base_de_datos.Rmd # El primer archivo que quieres combinar
-  - 2_Visualizacion.Rmd # El segundo archivo que quieres combinar
-  - 3_Preprocesamiento.Rmd # El tercer archivo que quieres combinar
-  - 4_Holter-Winter.Rmd # El cuarto archivo que quieres combinar
-  - 5_Modelos_estacionarios.Rmd # El quinto archivo que quieres combinar
-  - 6_Algoritmo_Prophet.Rmd # El sexto archivo que quieres combinar
+  - index.Rmd    
+  - 1_Base_de_datos.Rmd 
+  - 2_Visualizacion.Rmd 
+  - 3_Preprocesamiento.Rmd 
+  - 4_Holter-Winter.Rmd 
+  - 5_Modelos_estacionarios.Rmd 
+  - 6_Algoritmo_Prophet.Rmd 
+  - 7_Redes_Neuronales_Recurrentes.Rmd
 output_dir: "." 
 delete_merged_file: true

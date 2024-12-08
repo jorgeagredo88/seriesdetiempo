@@ -1,0 +1,242 @@
+# REDES NEURONALES RECURRENTES
+
+## Elman
+
+Comenzamos con la serie original de monto de remesas en dólares por fecha de pago.
+
+```{r echo=FALSE, warning=FALSE}
+
+Datos_FP6 <- Datos_FP[, c("Fecha_Pago", "Monto_USD")]
+head(Datos_FP6)
+
+
+```
+En el paso siguiente se realiza el escalamiento de la variable monto.
+
+```{r echo=FALSE}
+library(RSNNS)
+
+datos <- Datos_FP6[, "Monto_USD", drop = FALSE] 
+datos_scaled <- scale(datos)
+
+plot(Datos_FP6$Fecha_Pago, Datos_FP6$Monto_USD, 
+     type = "l", col = "blue",
+     xlab = "Fecha de Pago", ylab = "Monto (USD)", 
+     main = "Serie original Monto en el Tiempo")
+
+```
+
+```{r echo=FALSE}
+
+plot(Datos_FP6$Fecha_Pago, datos_scaled, 
+     type = "l", col = "blue",
+     xlab = "Fecha de Pago", ylab = "Monto (USD)", 
+     main = "Serie Escalada del Monto en el Tiempo")
+
+```
+
+A continuación se realiza la construcción de las variables rezagadas del modelo.
+
+```{r echo=FALSE}
+
+lagged_data <- embed(train_data, 8)  
+inputs <- lagged_data[, 2:8]  
+outputs <- lagged_data[, 1]   
+
+head(lagged_data)
+
+
+```
+El primer vector es el dependiente (output) mientras que los otros 7 serán las varaibles independientes (inputs) y a partir de estos set de datos se construyen los dataset de entrenamiento y prueba.
+
+```{r}
+set.seed(123)
+train_size <- round(0.8 * nrow(inputs))
+train_inputs <- inputs[1:train_size, ]
+train_outputs <- outputs[1:train_size]
+test_inputs <- inputs[(train_size + 1):nrow(inputs), ]
+test_outputs <- outputs[(train_size + 1):length(outputs)]
+```
+
+A partir de esto y de pruebas se estimo el modelo con los siguientes parametros:
+
+```{r}
+set.seed(123)
+elman_net <- elman(train_inputs, train_outputs,
+                   size = c(5),                
+                   learnFuncParams = c(0.1),    
+                   maxit = 10000,                
+                   linOut = TRUE)              
+
+print(elman_net)
+```
+
+### Interacciones
+
+```{r}
+plotIterativeError(elman_net)
+```
+### size
+
+```{r }
+size_values <- c(5, 10, 15, 20)
+results <- list()
+
+for (s in size_values) {
+  elman_net <- elman(train_inputs, train_outputs,
+                     size = c(s),
+                     learnFuncParams = c(0.1),
+                     maxit = 10000,
+                     linOut = TRUE)
+  pred <- predict(elman_net, test_inputs)
+  mse <- mean((test_outputs - pred)^2)
+  
+  results[[as.character(s)]] <- mse
+}
+
+optimal_size <- as.numeric(names(which.min(unlist(results))))
+print(optimal_size)
+```
+
+
+### Aprendizaje
+
+```{r}
+learning_rates <- c(0.01, 0.05, 0.1, 0.2, 0.5)
+results_lr <- list()
+
+for (lr in learning_rates) {
+  
+  elman_net <- elman(train_inputs, train_outputs,
+                     size = c(5),  # Usamos el tamaño óptimo encontrado antes
+                     learnFuncParams = c(lr),
+                     maxit = 10000,
+                     linOut = TRUE)
+    pred <- predict(elman_net, test_inputs)
+  mse <- mean((test_outputs - pred)^2)
+  
+  results_lr[[as.character(lr)]] <- mse
+}
+
+optimal_lr <- as.numeric(names(which.min(unlist(results_lr))))
+print(optimal_lr)
+
+
+```
+
+
+### Predicciones
+
+```{r echo=FALSE}
+
+predictions <- predict(elman_net, test_inputs)
+
+predictions_original <- predictions * attr(datos_scaled, "scaled:scale") + attr(datos_scaled, "scaled:center")
+test_outputs_original <- test_outputs * attr(datos_scaled, "scaled:scale") + attr(datos_scaled, "scaled:center")
+
+mse <- mean((test_outputs_original - predictions_original)^2)
+cat("Error cuadrático medio (MSE):", mse, "\n")
+
+```
+
+```{r echo=FALSE}
+plot(test_outputs_original, type = "l", col = "blue", lwd = 2, main = "Predicciones vs Valores Reales",
+     xlab = "Índice de Tiempo", ylab = "Monto_USD")
+lines(predictions_original, col = "red", lwd = 2)
+legend("topright", legend = c("Real", "Predicción"), col = c("blue", "red"), lty = 1, lwd = 2)
+
+
+```
+
+## Jordan
+
+Partimos del dataset escalado con rezagos utilizado en el modelo anterior.
+
+```{r echo=FALSE}
+
+jordan_net <- jordan(
+  x = train_inputs,               
+  y = train_outputs,              
+  size = c(5),                   
+  learnFuncParams = c(0.1),       
+  maxit = 4000,                 
+  linOut = TRUE                   
+)
+
+summary(jordan_net)
+```
+### Interacciones
+
+```{r echo=FALSE}
+
+plotIterativeError(jordan_net)
+
+```
+
+
+### size y aprendizaje
+
+```{r echo=FALSE}
+size_values <- c(5, 10, 15) 
+learn_rate_values <- c(0.01, 0.1, 0.2)
+
+results <- data.frame(size = integer(),
+                      learn_rate = numeric(),
+                      mse = numeric())
+
+for (size in size_values) {
+  for (learn_rate in learn_rate_values) {
+    
+    jordan_net <- jordan(
+      x = train_inputs,
+      y = train_outputs,
+      size = c(size),
+      learnFuncParams = c(learn_rate),
+      maxit = 4000,                 
+      linOut = TRUE                 
+    )
+    
+    
+    predictions <- predict(jordan_net, train_inputs)
+    
+  
+    mse <- mean((train_outputs - predictions)^2)
+    
+
+    results <- rbind(results, data.frame(size = size, learn_rate = learn_rate, mse = mse))
+  }
+}
+
+
+print(results)
+
+
+optimal_params <- results[which.min(results$mse), ]
+cat("Mejores parámetros:\n")
+print(optimal_params)
+
+
+```
+
+### Predicciones
+
+```{r echo=FALSE}
+predictions1 <- predict(jordan_net, test_inputs)
+
+predictions_original1 <- predictions * attr(datos_scaled, "scaled:scale") + attr(datos_scaled, "scaled:center")
+test_outputs_original1 <- test_outputs * attr(datos_scaled, "scaled:scale") + attr(datos_scaled, "scaled:center")
+
+mse1 <- mean((test_outputs_original - predictions_original)^2)
+cat("Error cuadrático medio (MSE):", mse1, "\n")
+
+```
+```{r echo=FALSE}
+plot(test_outputs_original1, type = "l", col = "blue", lwd = 2, main = "Predicciones vs Valores Reales",
+     xlab = "Índice de Tiempo", ylab = "Monto_USD")
+lines(predictions_original1, col = "red", lwd = 2)
+legend("topright", legend = c("Real", "Predicción"), col = c("blue", "red"), lty = 1, lwd = 2)
+
+
+
+```
+
